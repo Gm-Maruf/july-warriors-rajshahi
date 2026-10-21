@@ -101,6 +101,7 @@ h2 { font-size:calc(clamp(27px, 3.7vw, 40px) * var(--site-heading-scale)); line-
 .value-icon { background:var(--site-primary); color:white; width:39px; height:39px; display:grid; place-items:center; border-radius:12px; flex-shrink:0; }
 .value h3 { font-size:16px; margin-bottom:3px; }
 .value p { font-size:14px; color:var(--muted); margin-bottom:0; }
+  
 .notices { background:var(--surface-soft); }
 .notice-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
 .notice { padding:23px; background:var(--surface); border:1px solid var(--line); border-radius:calc(17px * var(--site-radius-scale)); display:flex; flex-direction:column; min-height:200px; }
@@ -108,6 +109,21 @@ h2 { font-size:calc(clamp(27px, 3.7vw, 40px) * var(--site-heading-scale)); line-
 .notice h3 { font-size:18px; line-height:1.45; margin-bottom:9px; }
 .notice p { color:var(--muted); font-size:14px; margin-bottom:16px; }
 .notice small { color:var(--muted); margin-top:auto; }
+
+  
+.notices .section-head { align-items:flex-start; }
+.notice-tools { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:12px; align-items:center; margin:0 0 22px; }
+.notice-search-wrap { position:relative; }
+.notice-search-wrap span { position:absolute; left:15px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; }
+.notice-search { width:100%; min-height:48px; border:1px solid var(--line); border-radius:13px; padding:11px 14px 11px 42px; background:var(--surface); color:var(--site-on-background); outline-offset:3px; }
+.notice-search:focus { border-color:var(--site-primary); box-shadow:0 0 0 3px rgba(11,92,67,.10); }
+.notice-filters { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+.notice-filter { border:1px solid var(--line); border-radius:999px; padding:8px 14px; background:var(--surface); color:var(--site-on-background); cursor:pointer; font-size:13px; font-weight:800; transition:background .18s,color .18s,border-color .18s; }
+.notice-filter:hover,.notice-filter[aria-pressed="true"] { background:var(--site-primary); border-color:var(--site-primary); color:#fff; }
+.notice-status { color:var(--muted); font-size:13px; margin:0 0 16px; }
+.notice-empty { display:none; border:1px dashed var(--line); border-radius:16px; padding:30px 20px; text-align:center; color:var(--muted); background:var(--surface); }
+.notice-empty.visible { display:block; }
+.notice[hidden] { display:none; }
 .callout { background:var(--site-primary); color:var(--site-on-primary); border-radius:calc(22px * var(--site-radius-scale)); padding:clamp(28px,5vw,48px); display:flex; align-items:center; justify-content:space-between; gap:24px; }
 .callout h2 { max-width:600px; margin-bottom:9px; }
 .callout p { color:rgba(255,255,255,.78); margin-bottom:0; }
@@ -269,13 +285,67 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
   </div>
 </section>
 
-    <section class="notices" id="notices"><div class="container"><div class="section-head"><div><div class="kicker">ঘোষণা ও নোটিশ</div><h2>সর্বশেষ আপডেট</h2><p>এই প্রিভিউতে নমুনা কনটেন্ট দেখানো হয়েছে। প্রকাশের আগে প্রকৃত নোটিশ দিয়ে প্রতিস্থাপন করুন।</p></div><span class="btn btn-outline" aria-label="নমুনা নোটিশ">নমুনা বিভাগ</span></div>
-      <div class="notice-grid">
-        <article class="notice"><div class="notice-date">নমুনা নোটিশ</div><h3>সাংগঠনিক ঘোষণা এখানে প্রকাশিত হবে</h3><p>সভা, কর্মসূচি অথবা জরুরি তথ্যের সংক্ষিপ্ত বিবরণ এখানে দেখানো যাবে।</p><small>তারিখ: পরে যুক্ত হবে</small></article>
-        <article class="notice"><div class="notice-date">সদস্যদের জন্য</div><h3>সদস্যদের তথ্য হালনাগাদ</h3><p>সদস্যদের তথ্য সংগ্রহ ও হালনাগাদের নিয়ম অনুমোদনের পর প্রকাশ করা হবে।</p><small>তারিখ: পরে যুক্ত হবে</small></article>
-        <article class="notice"><div class="notice-date">ওয়েবসাইট আপডেট</div><h3>ডিজিটাল প্ল্যাটফর্ম প্রস্তুতকরণ</h3><p>ওয়েবসাইটের বিভাগ, লোগো ও যোগাযোগের তথ্য চূড়ান্ত করার কাজ চলছে।</p><small>প্রিভিউ সংস্করণ</small></article>
+    ```html
+<section class="notices" id="notices">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="kicker">ঘোষণা ও নোটিশ</div>
+        <h2>নোটিশ বোর্ড</h2>
+        <p>সাংগঠনিক ঘোষণা, সদস্যদের তথ্য ও ওয়েবসাইটের আপডেট সহজে খুঁজুন।</p>
       </div>
-    </div></section>
+      <span class="btn btn-outline">প্রিভিউ নোটিশ</span>
+    </div>
+
+    <div class="notice-tools">
+      <div class="notice-search-wrap">
+        <span aria-hidden="true">⌕</span>
+        <input class="notice-search" id="notice-search" type="search"
+          placeholder="নোটিশ খুঁজুন..." aria-label="নোটিশ খুঁজুন">
+      </div>
+      <button class="btn btn-primary" type="button" id="notice-reset">
+        সব নোটিশ দেখুন ↺
+      </button>
+    </div>
+
+    <div class="notice-filters" role="group" aria-label="নোটিশের ধরন">
+      <button class="notice-filter" data-notice-filter="all" aria-pressed="true">সব নোটিশ</button>
+      <button class="notice-filter" data-notice-filter="org" aria-pressed="false">সাংগঠনিক</button>
+      <button class="notice-filter" data-notice-filter="members" aria-pressed="false">সদস্যদের জন্য</button>
+      <button class="notice-filter" data-notice-filter="website" aria-pressed="false">ওয়েবসাইট</button>
+    </div>
+
+    <p class="notice-status" id="notice-status" aria-live="polite">৩টি নোটিশ দেখানো হচ্ছে</p>
+
+    <div class="notice-grid" id="notice-grid">
+      <article class="notice" data-notice-category="org">
+        <div class="notice-date">সাংগঠনিক • নমুনা</div>
+        <h3>সাংগঠনিক ঘোষণা এখানে প্রকাশিত হবে</h3>
+        <p>সভা, কর্মসূচি অথবা জরুরি তথ্যের সংক্ষিপ্ত বিবরণ এখানে দেখানো যাবে।</p>
+        <small>তারিখ: পরে যুক্ত হবে</small>
+      </article>
+
+      <article class="notice" data-notice-category="members">
+        <div class="notice-date">সদস্যদের জন্য</div>
+        <h3>সদস্যদের তথ্য হালনাগাদ</h3>
+        <p>সদস্যদের তথ্য সংগ্রহ ও হালনাগাদের নিয়ম অনুমোদনের পর প্রকাশ করা হবে।</p>
+        <small>তারিখ: পরে যুক্ত হবে</small>
+      </article>
+
+      <article class="notice" data-notice-category="website">
+        <div class="notice-date">ওয়েবসাইট আপডেট</div>
+        <h3>ডিজিটাল প্ল্যাটফর্ম প্রস্তুতকরণ</h3>
+        <p>ওয়েবসাইটের বিভাগ, লোগো ও যোগাযোগের তথ্য চূড়ান্ত করার কাজ চলছে।</p>
+        <small>প্রিভিউ সংস্করণ</small>
+      </article>
+    </div>
+
+    <div class="notice-empty" id="notice-empty" role="status">
+      কোনো নোটিশ পাওয়া যায়নি। অন্য শব্দ দিয়ে খুঁজুন অথবা “সব নোটিশ দেখুন” চাপুন।
+    </div>
+  </div>
+</section>
+
     <section id="contact"><div class="container"><div class="callout"><div><h2>আপডেট থাকুন, যোগাযোগে থাকুন</h2><p>অনুমোদিত যোগাযোগের তথ্য যুক্ত হলে এই অংশ থেকে সদস্য ও দর্শনার্থীরা যোগাযোগ করতে পারবেন।</p></div><button class="btn btn-secondary" onclick="openLogin()">সদস্যদের প্রবেশ</button></div></div></section>
   </main>
   <footer><div class="container"><div class="footer-main"><div><a class="brand" href="#home" style="color:white"><span class="logo"><span style="font-size:23px">✊</span></span><span><span class="brand-name">আমরা জুলাই যোদ্ধা</span><span class="brand-sub" style="display:block;color:rgba(255,255,255,.6)">রাজশাহী ইউনিট</span></span></a><p>ঐক্য, মর্যাদা ও দায়িত্বশীল অংশগ্রহণের চেতনায় নির্মিত একটি প্রাথমিক ওয়েবসাইট প্রিভিউ।</p></div><div class="footer-links"><a href="#about">আমাদের সম্পর্কে</a><a href="#activities">কার্যক্রম</a><a href="#notices">নোটিশ</a><a href="#home">উপরে ফিরুন ↑</a></div></div><div class="copyright"><span>© ২০২৬ আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</span><span>ওয়েবসাইট প্রিভিউ • প্রকাশিত ওয়েবসাইট নয়</span></div></div></footer>
@@ -289,6 +359,63 @@ function toggleMenu(){document.getElementById('navlinks').classList.toggle('open
 function demoLogin(e){e.preventDefault();document.getElementById('login-message').textContent='প্রিভিউ সফলভাবে পরীক্ষা করা হয়েছে। প্রকৃত সদস্য লগইনের জন্য নিরাপদ authentication ব্যবস্থা যুক্ত করতে হবে।';}
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLogin();});
 document.querySelectorAll('#navlinks a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('navlinks').classList.remove('open');});});
+
+```javascript
+var noticeSearch = document.getElementById('notice-search');
+var noticeCards = Array.from(document.querySelectorAll('#notice-grid .notice'));
+var noticeFilters = Array.from(document.querySelectorAll('[data-notice-filter]'));
+var activeNoticeFilter = 'all';
+
+function filterNotices() {
+  var query = (noticeSearch.value || '').trim().toLocaleLowerCase();
+  var visible = 0;
+
+  noticeCards.forEach(function(card) {
+    var category = card.getAttribute('data-notice-category');
+    var matchesCategory = activeNoticeFilter === 'all' || category === activeNoticeFilter;
+    var matchesQuery = !query || card.textContent.toLocaleLowerCase().includes(query);
+    var show = matchesCategory && matchesQuery;
+
+    card.hidden = !show;
+    if (show) visible++;
+  });
+
+  document.getElementById('notice-status').textContent =
+    visible + 'টি নোটিশ দেখানো হচ্ছে';
+
+  document.getElementById('notice-empty').classList.toggle('visible', visible === 0);
+}
+
+noticeSearch.addEventListener('input', filterNotices);
+
+noticeFilters.forEach(function(button) {
+  button.addEventListener('click', function() {
+    activeNoticeFilter = button.getAttribute('data-notice-filter');
+
+    noticeFilters.forEach(function(item) {
+      item.setAttribute('aria-pressed', String(item === button));
+    });
+
+    filterNotices();
+  });
+});
+
+document.getElementById('notice-reset').addEventListener('click', function() {
+  noticeSearch.value = '';
+  activeNoticeFilter = 'all';
+
+  noticeFilters.forEach(function(button) {
+    button.setAttribute(
+      'aria-pressed',
+      String(button.getAttribute('data-notice-filter') === 'all')
+    );
+  });
+
+  filterNotices();
+  noticeSearch.focus();
+});
+```
+  
 </script>
 </body>
 </html>
