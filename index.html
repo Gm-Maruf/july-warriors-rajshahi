@@ -400,22 +400,17 @@ noticeFilters.forEach(function(button) {
   });
 });
 
-document.getElementById('notice-reset').addEventListener('click', function() {
-  noticeSearch.value = '';
-  activeNoticeFilter = 'all';
-
-  noticeFilters.forEach(function(button) {
-    button.setAttribute(
-      'aria-pressed',
-      String(button.getAttribute('data-notice-filter') === 'all')
-    );
+console.log('Notice reset button is ready');
+document.getElementById('notice-reset').addEventListener('click',function(){
+  noticeSearch.value='';
+  activeNoticeFilter='all';
+  noticeFilters.forEach(function(button){
+    button.setAttribute('aria-pressed',String(button.getAttribute('data-notice-filter')==='all'));
   });
-
   filterNotices();
   noticeSearch.focus();
 });
-```
-  
+
 </script>
 </body>
 </html>
