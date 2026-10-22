@@ -370,14 +370,58 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
   </main>
   <footer><div class="container"><div class="footer-main"><div><a class="brand" href="#home" style="color:white"><span class="logo"><span style="font-size:23px">✊</span></span><span><span class="brand-name">আমরা জুলাই যোদ্ধা</span><span class="brand-sub" style="display:block;color:rgba(255,255,255,.6)">রাজশাহী ইউনিট</span></span></a><p>ঐক্য, মর্যাদা ও দায়িত্বশীল অংশগ্রহণের চেতনায় নির্মিত একটি প্রাথমিক ওয়েবসাইট প্রিভিউ।</p></div><div class="footer-links"><a href="#about">আমাদের সম্পর্কে</a><a href="#activities">কার্যক্রম</a><a href="#notices">নোটিশ</a><a href="#home">উপরে ফিরুন ↑</a></div></div><div class="copyright"><span>© ২০২৬ আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</span><span>ওয়েবসাইট প্রিভিউ • প্রকাশিত ওয়েবসাইট নয়</span></div></div></footer>
 </div>
-<div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onclick="backdropClose(event)"><div class="modal"><div class="modal-head"><div><div class="kicker">সদস্য এলাকা</div><h2 id="login-title">সদস্য লগইন</h2></div><button class="close" aria-label="বন্ধ করুন" onclick="closeLogin()">✕</button></div><p style="color:var(--muted);font-size:14px">সদস্যদের জন্য নির্ধারিত প্রবেশদ্বার।</p><form onsubmit="demoLogin(event)"><label class="form-label" for="member-user">ইউজারনেম</label><input class="form-input" id="member-user" autocomplete="username" placeholder="আপনার ইউজারনেম" required><label class="form-label" for="member-pass">পাসওয়ার্ড</label><input class="form-input" id="member-pass" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড" required><div class="form-note">এটি শুধু ডিজাইন প্রিভিউ। লগইন এখনো কোনো সার্ভার বা সদস্য-ডাটাবেসের সঙ্গে যুক্ত নয়। এখানে আসল পাসওয়ার্ড দেবেন না।</div><button class="btn btn-primary" type="submit" style="width:100%">প্রিভিউ পরীক্ষা করুন</button><div id="login-message" role="status"></div></form></div></div>
+<div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onclick="backdropClose(event)"><div class="modal"><div class="modal-head"><div><div class="kicker">সদস্য এলাকা</div><h2 id="login-title">সদস্য লগইন</h2></div><button class="close" aria-label="বন্ধ করুন" onclick="closeLogin()">✕</button></div><p style="color:var(--muted);font-size:14px">সদস্যদের জন্য নির্ধারিত প্রবেশদ্বার।</p><form onsubmit="demoLogin(event)"><label class="form-label" for="member-user">ইমেইল</label><input class="form-input" id="member-user" type="email" autocomplete="username" placeholder="আপনার ইমেইল ঠিকানা" required><label class="form-label" for="member-pass">পাসওয়ার্ড</label><input class="form-input" id="member-pass" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড" required><div class="form-note">এটি শুধু ডিজাইন প্রিভিউ। লগইন এখনো কোনো সার্ভার বা সদস্য-ডাটাবেসের সঙ্গে যুক্ত নয়। এখানে আসল পাসওয়ার্ড দেবেন না।</div><button class="btn btn-primary" type="submit" style="width:100%">প্রিভিউ পরীক্ষা করুন</button><div id="login-message" role="status"></div></form></div></div>
+
+  
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCd6D2FrQlf8BzNxwc0fsAQOMvIL7gyBeo",
+  authDomain: "july-warriors-rajshahi.firebaseapp.com",
+  projectId: "july-warriors-rajshahi",
+  storageBucket: "july-warriors-rajshahi.firebasestorage.app",
+  messagingSenderId: "924459469183",
+  appId: "1:924459469183:web:d1988354548f817896324a",
+  measurementId: "G-H2GH9Q0Q1V"
+};
+
+firebase.initializeApp(firebaseConfig);
+</script>
+
+  
+  <script>
 function openLogin(){document.getElementById('login-modal').classList.add('open');document.getElementById('member-user').focus();}
 function closeLogin(){document.getElementById('login-modal').classList.remove('open');document.getElementById('login-message').textContent='';}
 function backdropClose(e){if(e.target.id==='login-modal')closeLogin();}
 function toggleMenu(){document.getElementById('navlinks').classList.toggle('open');}
-function demoLogin(e){e.preventDefault();document.getElementById('login-message').textContent='প্রিভিউ সফলভাবে পরীক্ষা করা হয়েছে। প্রকৃত সদস্য লগইনের জন্য নিরাপদ authentication ব্যবস্থা যুক্ত করতে হবে।';}
-document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLogin();});
+
+    
+
+function demoLogin(e) {
+  e.preventDefault();
+
+  const email = document.getElementById('member-user').value.trim();
+  const password = document.getElementById('member-pass').value;
+  const message = document.getElementById('login-message');
+
+  message.textContent = 'লগইন যাচাই হচ্ছে...';
+
+  firebase.auth().signInWithEmailAndPassword(email, password)
+    .then(function(userCredential) {
+      message.textContent = 'লগইন সফল হয়েছে!';
+    })
+    .catch(function(error) {
+      if (error.code === 'auth/invalid-credential') {
+        message.textContent = 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।';
+      } else {
+        message.textContent = 'লগইন হয়নি। সেটিংস যাচাই করুন। (' + error.code + ')';
+      }
+    });
+}
+
+    
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLogin();});
 document.querySelectorAll('#navlinks a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('navlinks').classList.remove('open');});});
 
 ```javascript
