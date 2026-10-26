@@ -370,11 +370,52 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
   </main>
   <footer><div class="container"><div class="footer-main"><div><a class="brand" href="#home" style="color:white"><span class="logo"><span style="font-size:23px">✊</span></span><span><span class="brand-name">আমরা জুলাই যোদ্ধা</span><span class="brand-sub" style="display:block;color:rgba(255,255,255,.6)">রাজশাহী ইউনিট</span></span></a><p>ঐক্য, মর্যাদা ও দায়িত্বশীল অংশগ্রহণের চেতনায় নির্মিত একটি প্রাথমিক ওয়েবসাইট প্রিভিউ।</p></div><div class="footer-links"><a href="#about">আমাদের সম্পর্কে</a><a href="#activities">কার্যক্রম</a><a href="#notices">নোটিশ</a><a href="#home">উপরে ফিরুন ↑</a></div></div><div class="copyright"><span>© ২০২৬ আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</span><span>ওয়েবসাইট প্রিভিউ • প্রকাশিত ওয়েবসাইট নয়</span></div></div></footer>
 </div>
-<div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onclick="backdropClose(event)"><div class="modal"><div class="modal-head"><div><div class="kicker">সদস্য এলাকা</div><h2 id="login-title">সদস্য লগইন</h2></div><button class="close" aria-label="বন্ধ করুন" onclick="closeLogin()">✕</button></div><p style="color:var(--muted);font-size:14px">সদস্যদের জন্য নির্ধারিত প্রবেশদ্বার।</p><form onsubmit="demoLogin(event)"><label class="form-label" for="member-user">ইমেইল</label><input class="form-input" id="member-user" type="email" autocomplete="username" placeholder="আপনার ইমেইল ঠিকানা" required><label class="form-label" for="member-pass">পাসওয়ার্ড</label><input class="form-input" id="member-pass" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড" required><div class="form-note">এটি শুধু ডিজাইন প্রিভিউ। লগইন এখনো কোনো সার্ভার বা সদস্য-ডাটাবেসের সঙ্গে যুক্ত নয়। এখানে আসল পাসওয়ার্ড দেবেন না।</div><button class="btn btn-primary" type="submit" style="width:100%">প্রিভিউ পরীক্ষা করুন</button><div id="login-message" role="status"></div></form></div></div>
+<div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onclick="backdropClose(event)"><div class="modal"><div class="modal-head"><div><div class="kicker">সদস্য এলাকা</div><h2 id="login-title">সদস্য লগইন</h2></div><button class="close" aria-label="বন্ধ করুন" onclick="closeLogin()">✕</button></div><p style="color:var(--muted);font-size:14px">সদস্যদের জন্য নির্ধারিত প্রবেশদ্বার।</p><form id="member-login-form" onsubmit="demoLogin(event)"><label class="form-label" for="member-user">ইমেইল</label><input class="form-input" id="member-user" type="email" autocomplete="username" placeholder="আপনার ইমেইল ঠিকানা" required><label class="form-label" for="member-pass">পাসওয়ার্ড</label><input class="form-input" id="member-pass" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড" required><div class="form-note">সদস্যদের তথ্য নিরাপদভাবে দেখতে লগইন করুন</div><button class="btn btn-primary" type="submit" style="width:100%">প্রিভিউ পরীক্ষা করুন</button><div id="login-message" role="status"></div></form>
+
+<div id="member-profile" hidden>
+  <h3>আমার সদস্য-তথ্য</h3>
+
+  <label class="form-label" for="profile-name">নাম</label>
+  <input class="form-input" id="profile-name" maxlength="100">
+
+  <label class="form-label" for="profile-email">ইমেইল</label>
+  <input class="form-input" id="profile-email" type="email" maxlength="254">
+
+  <label class="form-label" for="profile-phone">মোবাইল নম্বর</label>
+  <input class="form-input" id="profile-phone" maxlength="30">
+
+  <label class="form-label" for="profile-address">ঠিকানা</label>
+  <input class="form-input" id="profile-address" maxlength="500">
+
+  <label class="form-label" for="profile-photo">প্রোফাইল ছবির লিংক</label>
+  <input class="form-input" id="profile-photo" type="url" maxlength="2048">
+
+  <button class="btn btn-primary" type="button"
+    style="width:100%;margin-top:16px"
+    onclick="saveMemberProfile()">
+    তথ্য সংরক্ষণ করুন
+  </button>
+
+  <button class="btn btn-outline" type="button"
+    style="width:100%;margin-top:10px"
+    onclick="logoutMember()">
+    লগআউট
+  </button>
+
+  <div id="profile-message" role="status"></div>
+
+  <p style="font-size:12px;color:var(--muted);margin-top:12px">
+    ইমেইল এখানে পরিবর্তন করলে শুধু Firestore-এর সদস্য-তথ্য বদলাবে।
+    লগইন ইমেইল পরিবর্তনের জন্য আলাদা ব্যবস্থা প্রয়োজন।
+  </p>
+</div>
+
+</div></div>
 
   
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyCd6D2FrQlf8BzNxwc0fsAQOMvIL7gyBeo",
@@ -399,6 +440,8 @@ function toggleMenu(){document.getElementById('navlinks').classList.toggle('open
     
 
 function demoLogin(e) {
+  
+function demoLogin(e) {
   e.preventDefault();
 
   const email = document.getElementById('member-user').value.trim();
@@ -409,15 +452,106 @@ function demoLogin(e) {
 
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(function(userCredential) {
-      message.textContent = 'লগইন সফল হয়েছে!';
+      return loadMemberProfile(userCredential.user);
     })
     .catch(function(error) {
       if (error.code === 'auth/invalid-credential') {
         message.textContent = 'ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।';
       } else {
-        message.textContent = 'লগইন হয়নি। সেটিংস যাচাই করুন। (' + error.code + ')';
+        message.textContent =
+          'সমস্যা হয়েছে: ' + error.code;
       }
     });
+}
+
+function loadMemberProfile(user) {
+  const message = document.getElementById('login-message');
+  message.textContent = 'সদস্যের তথ্য লোড হচ্ছে...';
+
+  return firebase.firestore()
+    .collection('members')
+    .doc(user.uid)
+    .get()
+    .then(function(doc) {
+      if (!doc.exists) {
+        message.textContent =
+          'আপনার সদস্যের রেকর্ড পাওয়া যায়নি। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+        return;
+      }
+
+      const data = doc.data();
+
+      document.getElementById('member-profile').hidden = false;
+      document.getElementById('member-login-form').hidden = true;
+
+      document.getElementById('profile-name').value = data.name || '';
+      document.getElementById('profile-email').value = data.email || user.email || '';
+      document.getElementById('profile-phone').value = data.phone || '';
+      document.getElementById('profile-address').value = data.address || '';
+      document.getElementById('profile-photo').value = data.photoURL || '';
+
+      message.textContent = 'আপনার সদস্য-তথ্য লোড হয়েছে।';
+    })
+    .catch(function(error) {
+      message.textContent =
+        'সদস্যের তথ্য লোড করা যায়নি: ' + error.code;
+    });
+}
+
+function saveMemberProfile() {
+  const user = firebase.auth().currentUser;
+  const message = document.getElementById('profile-message');
+
+  if (!user) {
+    message.textContent = 'প্রথমে লগইন করুন।';
+    return;
+  }
+
+  const data = {
+    name: document.getElementById('profile-name').value.trim(),
+    email: document.getElementById('profile-email').value.trim(),
+    phone: document.getElementById('profile-phone').value.trim(),
+    address: document.getElementById('profile-address').value.trim(),
+    photoURL: document.getElementById('profile-photo').value.trim()
+  };
+
+  if (!data.name || !data.email) {
+    message.textContent = 'নাম ও ইমেইল পূরণ করুন।';
+    return;
+  }
+
+  message.textContent = 'তথ্য সংরক্ষণ হচ্ছে...';
+
+  firebase.firestore()
+    .collection('members')
+    .doc(user.uid)
+    .update(data)
+    .then(function() {
+      message.textContent =
+        'আপনার সদস্য-তথ্য সংরক্ষণ হয়েছে।';
+    })
+    .catch(function(error) {
+      message.textContent =
+        'তথ্য সংরক্ষণ করা যায়নি: ' + error.code;
+    });
+}
+
+function logoutMember() {
+  firebase.auth().signOut()
+    .then(function() {
+      document.getElementById('member-profile').hidden = true;
+      document.getElementById('member-login-form').hidden = false;
+      document.getElementById('login-message').textContent =
+        'আপনি লগআউট করেছেন।';
+      document.getElementById('profile-message').textContent = '';
+      document.getElementById('member-pass').value = '';
+    })
+    .catch(function(error) {
+      document.getElementById('login-message').textContent =
+        'লগআউট করা যায়নি: ' + error.code;
+    });
+}
+
 }
 
     
