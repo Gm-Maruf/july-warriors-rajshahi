@@ -291,7 +291,7 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
   </div>
 </section>
 
-    ```html
+
 <section class="notices" id="notices">
   <div class="container">
     <div class="section-head">
@@ -424,7 +424,6 @@ function demoLogin(e) {
     document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLogin();});
 document.querySelectorAll('#navlinks a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('navlinks').classList.remove('open');});});
 
-```javascript
 var noticeSearch = document.getElementById('notice-search');
 var noticeCards = Array.from(document.querySelectorAll('#notice-grid .notice'));
 var noticeFilters = Array.from(document.querySelectorAll('[data-notice-filter]'));
