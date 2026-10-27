@@ -1,0 +1,407 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Panel | আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</title>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      color: #172033;
+    }
+    header {
+      background: #102d50;
+      color: white;
+      padding: 22px 16px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 8px; font-size: 23px; }
+    header p { margin: 0; }
+    main { max-width: 1000px; margin: 25px auto; padding: 0 15px; }
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 14px #102d5012;
+    }
+    h2 { margin-top: 0; color: #102d50; }
+    input, textarea, button {
+      width: 100%;
+      padding: 11px;
+      margin: 6px 0;
+      border-radius: 7px;
+      border: 1px solid #cbd5e1;
+      font: inherit;
+    }
+    textarea { min-height: 95px; resize: vertical; }
+    button {
+      background: #123e6a;
+      color: white;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    .secondary { background: #475569; }
+    .danger { background: #b42318; }
+    .hidden { display: none !important; }
+    .status { padding: 10px 0; overflow-wrap: anywhere; }
+    .member, .notice {
+      border: 1px solid #dbe3ed;
+      padding: 13px;
+      margin: 10px 0;
+      border-radius: 8px;
+      overflow-wrap: anywhere;
+    }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .actions button { width: auto; }
+    a { color: #dbeafe; }
+    footer { text-align: center; padding: 20px; color: #64748b; }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <header>
+    <h1>আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</h1>
+    <p>Administrator Control Panel</p>
+    <p><a href="./index.html">মূল ওয়েবসাইটে ফিরে যান</a></p>
+  </header>
+
+  <main>
+    <section id="login-panel" class="panel">
+      <h2>Admin Login</h2>
+      <p>শুধু অনুমোদিত Admin অ্যাকাউন্ট দিয়ে প্রবেশ করুন।</p>
+      <form id="login-form">
+        <input id="admin-email" type="email" placeholder="Admin Email" required>
+        <input id="admin-password" type="password" placeholder="Password" required>
+        <button id="login-button" type="submit">লগইন</button>
+      </form>
+      <div id="login-status" class="status" role="status"></div>
+    </section>
+
+    <section id="admin-panel" class="hidden">
+      <div class="panel">
+        <h2>Admin Dashboard</h2>
+        <p id="admin-welcome"></p>
+        <button id="logout-button" class="secondary">লগআউট</button>
+      </div>
+
+      <div class="panel">
+        <h2>সদস্য ব্যবস্থাপনা</h2>
+        <p>নিচে Firestore-এ সংরক্ষিত সদস্যদের তথ্য দেখা যাবে।</p>
+        <button id="reload-members">সদস্য তালিকা রিফ্রেশ</button>
+        <div id="members-status" class="status"></div>
+        <div id="members-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>বিশেষ নোটিশ প্রকাশ</h2>
+        <form id="notice-form">
+          <input id="notice-title" maxlength="150" placeholder="নোটিশের শিরোনাম" required>
+          <textarea id="notice-body" maxlength="5000" placeholder="নোটিশের বিস্তারিত" required></textarea>
+          <button type="submit">নোটিশ প্রকাশ করুন</button>
+        </form>
+        <div id="notice-status" class="status" role="status"></div>
+      </div>
+
+      <div class="panel">
+        <h2>বিশেষ নোটিশ ব্যবস্থাপনা</h2>
+        <button id="reload-notices" class="secondary">নোটিশ তালিকা রিফ্রেশ</button>
+        <div id="special-notices-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>ঐক্য • সাহস • অধিকার</footer>
+
+  <script>
+    /*
+      গুরুত্বপূর্ণ:
+      নিচের firebaseConfig-এর মান index.html-এ ব্যবহৃত
+      আপনার আসল Firebase config-এর সঙ্গে মিলিয়ে বসাতে হবে।
+    */
+    var firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "july-warriors-rajshahi.firebaseapp.com",
+      projectId: "july-warriors-rajshahi",
+      storageBucket: "july-warriors-rajshahi.firebasestorage.app",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+    var currentAdmin = null;
+
+    var loginPanel = document.getElementById("login-panel");
+    var adminPanel = document.getElementById("admin-panel");
+    var loginStatus = document.getElementById("login-status");
+
+    function showAdminError(elementId, error) {
+      document.getElementById(elementId).textContent =
+        "সমস্যা হয়েছে: " + (error.message || error);
+    }
+
+    document.getElementById("login-form").addEventListener("submit", function(e) {
+      e.preventDefault();
+      loginStatus.textContent = "লগইন যাচাই হচ্ছে...";
+
+      var email = document.getElementById("admin-email").value.trim();
+      var password = document.getElementById("admin-password").value;
+
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(function(error) {
+          loginStatus.textContent = "লগইন ব্যর্থ হয়েছে। ইমেইল ও পাসওয়ার্ড পরীক্ষা করুন।";
+          console.error(error);
+        });
+    });
+
+    auth.onAuthStateChanged(async function(user) {
+      currentAdmin = null;
+      adminPanel.classList.add("hidden");
+
+      if (!user) {
+        loginPanel.classList.remove("hidden");
+        return;
+      }
+
+      try {
+        var doc = await db.collection("members").doc(user.uid).get();
+
+        if (!doc.exists || doc.data().role !== "admin") {
+          loginPanel.classList.remove("hidden");
+          loginStatus.textContent = "এই অ্যাকাউন্টের Admin অনুমতি নেই।";
+          await auth.signOut();
+          return;
+        }
+
+        currentAdmin = user;
+        loginPanel.classList.add("hidden");
+        adminPanel.classList.remove("hidden");
+        document.getElementById("admin-welcome").textContent =
+          "Admin হিসেবে লগইন করেছেন: " + user.email;
+
+        loadMembers();
+        loadSpecialNotices();
+      } catch (error) {
+        loginPanel.classList.remove("hidden");
+        loginStatus.textContent =
+          "Admin যাচাই করা যায়নি। Firebase config ও Security Rules পরীক্ষা করুন।";
+        console.error(error);
+      }
+    });
+
+    document.getElementById("logout-button").addEventListener("click", function() {
+      auth.signOut();
+    });
+
+    async function loadMembers() {
+      if (!currentAdmin) return;
+
+      var list = document.getElementById("members-list");
+      var status = document.getElementById("members-status");
+      list.replaceChildren();
+      status.textContent = "সদস্যদের তথ্য লোড হচ্ছে...";
+
+      try {
+        var snapshot = await db.collection("members").get();
+
+        snapshot.forEach(function(doc) {
+          var data = doc.data();
+          var card = document.createElement("div");
+          card.className = "member";
+
+          var title = document.createElement("strong");
+          title.textContent = data.name || "নাম দেওয়া হয়নি";
+          card.appendChild(title);
+
+          ["email", "phone", "address", "role"].forEach(function(field) {
+            var line = document.createElement("p");
+            line.textContent = field + ": " + (data[field] || "তথ্য নেই");
+            card.appendChild(line);
+          });
+
+          var actions = document.createElement("div");
+          actions.className = "actions";
+
+          var edit = document.createElement("button");
+          edit.textContent = "তথ্য সম্পাদনা";
+          edit.addEventListener("click", function() {
+            editMember(doc.id, data);
+          });
+          actions.appendChild(edit);
+
+          if (doc.id !== currentAdmin.uid) {
+            var remove = document.createElement("button");
+            remove.textContent = "সদস্য রেকর্ড মুছুন";
+            remove.className = "danger";
+            remove.addEventListener("click", function() {
+              deleteMember(doc.id, data.name || doc.id);
+            });
+            actions.appendChild(remove);
+          }
+
+          card.appendChild(actions);
+          list.appendChild(card);
+        });
+
+        status.textContent = "মোট সদস্য রেকর্ড: " + snapshot.size;
+      } catch (error) {
+        status.textContent = "সদস্য তালিকা লোড করা যায়নি।";
+        console.error(error);
+      }
+    }
+
+    async function editMember(uid, data) {
+      if (!currentAdmin) return;
+
+      var name = prompt("সদস্যের নাম:", data.name || "");
+      if (name === null) return;
+
+      var phone = prompt("ফোন নম্বর:", data.phone || "");
+      if (phone === null) return;
+
+      var address = prompt("ঠিকানা:", data.address || "");
+      if (address === null) return;
+
+      var role = data.role || "member";
+      if (uid !== currentAdmin.uid) {
+        role = prompt("Role লিখুন (member/admin):", role);
+        if (role === null) return;
+        role = role.trim().toLowerCase();
+        if (role !== "member" && role !== "admin") {
+          alert("Role অবশ্যই member অথবা admin হতে হবে।");
+          return;
+        }
+      }
+
+      try {
+        var updateData = {
+          name: name.trim(),
+          phone: phone.trim(),
+          address: address.trim()
+        };
+
+        if (uid !== currentAdmin.uid) updateData.role = role;
+
+        await db.collection("members").doc(uid).update(updateData);
+        alert("সদস্যের তথ্য আপডেট হয়েছে।");
+        loadMembers();
+      } catch (error) {
+        alert("আপডেট ব্যর্থ হয়েছে: " + error.message);
+      }
+    }
+
+    async function deleteMember(uid, name) {
+      if (!currentAdmin) return;
+
+      if (!confirm(
+        name + " -এর Firestore সদস্য রেকর্ড মুছে ফেলবেন?\n" +
+        "এতে Firebase Authentication অ্যাকাউন্ট মুছবে না।"
+      )) return;
+
+      try {
+        await db.collection("members").doc(uid).delete();
+        alert("সদস্য রেকর্ড মুছে ফেলা হয়েছে।");
+        loadMembers();
+      } catch (error) {
+        alert("মুছে ফেলা যায়নি: " + error.message);
+      }
+    }
+
+    document.getElementById("reload-members").addEventListener("click", loadMembers);
+
+    document.getElementById("notice-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      if (!currentAdmin) return;
+
+      var title = document.getElementById("notice-title").value.trim();
+      var body = document.getElementById("notice-body").value.trim();
+      var status = document.getElementById("notice-status");
+
+      if (!title || !body) {
+        status.textContent = "শিরোনাম ও বিস্তারিত লিখুন।";
+        return;
+      }
+
+      status.textContent = "নোটিশ প্রকাশ হচ্ছে...";
+
+      try {
+        await db.collection("specialNotices").add({
+          title: title,
+          body: body,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          createdBy: currentAdmin.uid
+        });
+
+        document.getElementById("notice-form").reset();
+        status.textContent = "বিশেষ নোটিশ প্রকাশ হয়েছে।";
+        loadSpecialNotices();
+      } catch (error) {
+        status.textContent = "নোটিশ প্রকাশ করা যায়নি: " + error.message;
+      }
+    });
+
+    async function loadSpecialNotices() {
+      if (!currentAdmin) return;
+
+      var list = document.getElementById("special-notices-list");
+      list.replaceChildren();
+
+      try {
+        var snapshot = await db.collection("specialNotices")
+          .orderBy("createdAt", "desc").get();
+
+        snapshot.forEach(function(doc) {
+          var data = doc.data();
+          var card = document.createElement("div");
+          card.className = "notice";
+
+          var heading = document.createElement("strong");
+          heading.textContent = data.title || "শিরোনাম নেই";
+          card.appendChild(heading);
+
+          var content = document.createElement("p");
+          content.textContent = data.body || "";
+          card.appendChild(content);
+
+          var remove = document.createElement("button");
+          remove.textContent = "নোটিশ মুছুন";
+          remove.className = "danger";
+          remove.addEventListener("click", async function() {
+            if (!confirm("এই বিশেষ নোটিশটি মুছে ফেলবেন?")) return;
+
+            try {
+              await db.collection("specialNotices").doc(doc.id).delete();
+              loadSpecialNotices();
+            } catch (error) {
+              alert("নোটিশ মুছতে সমস্যা হয়েছে: " + error.message);
+            }
+          });
+
+          card.appendChild(remove);
+          list.appendChild(card);
+        });
+      } catch (error) {
+        list.textContent = "নোটিশ লোড করা যায়নি: " + error.message;
+      }
+    }
+
+    document.getElementById("reload-notices")
+      .addEventListener("click", loadSpecialNotices);
+  </script>
+</body>
+</html>
