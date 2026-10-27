@@ -497,6 +497,8 @@ function loadMemberProfile(user) {
 }
 
 firebase.auth().onAuthStateChanged(function(user) {
+console.log('Firebase auth state:', user ? user.uid : 'SIGNED OUT');
+  
   const loginForm = document.getElementById('member-login-form');
   const profile = document.getElementById('member-profile');
   const message = document.getElementById('login-message');
