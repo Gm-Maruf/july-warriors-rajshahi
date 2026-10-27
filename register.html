@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>সদস্য নিবন্ধন | আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 14px;
+      background: #f1f5f9;
+      color: #172033;
+      font-family: Arial, "Noto Sans Bengali", sans-serif;
+    }
+    .card {
+      max-width: 520px;
+      margin: 20px auto;
+      padding: 28px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px #0f172a12;
+    }
+    h1 { text-align: center; font-size: 25px; }
+    .subtitle { text-align: center; color: #64748b; }
+    label { display: block; margin: 15px 0 6px; font-weight: 600; }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 13px;
+      background: #123b73;
+      color: white;
+      border: 0;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: .6; cursor: wait; }
+    #message {
+      margin-top: 16px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
+    .back { text-align: center; margin-top: 20px; }
+    .back a { color: #123b73; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>সদস্য নিবন্ধন</h1>
+    <p class="subtitle">আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</p>
+
+    <form id="registerForm">
+      <label for="name">পূর্ণ নাম *</label>
+      <input id="name" maxlength="100" required>
+
+      <label for="email">ইমেইল *</label>
+      <input id="email" type="email" maxlength="254" required>
+
+      <label for="phone">মোবাইল নম্বর *</label>
+      <input id="phone" type="tel" maxlength="30" required>
+
+      <label for="address">ঠিকানা *</label>
+      <textarea id="address" maxlength="500" rows="3" required></textarea>
+
+      <label for="password">পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর) *</label>
+      <input id="password" type="password" minlength="6"
+             autocomplete="new-password" required>
+
+      <label for="confirmPassword">পাসওয়ার্ড পুনরায় লিখুন *</label>
+      <input id="confirmPassword" type="password"
+             autocomplete="new-password" required>
+
+      <button id="submitBtn" type="submit">নিবন্ধনের আবেদন করুন</button>
+    </form>
+
+    <div id="message" role="status" aria-live="polite"></div>
+
+    <div class="back">
+      <a href="index.html">মূল ওয়েবসাইটে ফিরে যান</a>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "july-warriors-rajshahi.firebaseapp.com",
+      projectId: "july-warriors-rajshahi",
+      storageBucket: "july-warriors-rajshahi.firebasestorage.app",
+      messagingSenderId: "924459469183",
+      appId: "1:924459469183:web:d1988354548f817896324a",
+      measurementId: "G-H2GH9Q0Q1V"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    const form = document.getElementById("registerForm");
+    const button = document.getElementById("submitBtn");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+      if (password !== confirmPassword) {
+        message.textContent = "দুটি পাসওয়ার্ড মিলছে না।";
+        return;
+      }
+
+      if (!name || !email || !phone || !address) {
+        message.textContent = "সব তথ্য পূরণ করুন।";
+        return;
+      }
+
+      button.disabled = true;
+      message.textContent = "নিবন্ধনের আবেদন জমা হচ্ছে...";
+
+      let createdUser = null;
+
+      try {
+        const credential = await auth.createUserWithEmailAndPassword(
+          email, password
+        );
+        createdUser = credential.user;
+
+        await db.collection("memberApplications")
+          .doc(createdUser.uid)
+          .set({
+            name: name,
+            email: email,
+            phone: phone,
+            address: address,
+            status: "pending",
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+        message.textContent =
+          "আপনার নিবন্ধনের আবেদন জমা হয়েছে। Admin অনুমোদনের জন্য অপেক্ষা করুন।";
+
+        form.reset();
+      } catch (error) {
+        if (createdUser) {
+          message.textContent =
+            "অ্যাকাউন্ট তৈরি হয়েছে, কিন্তু আবেদন জমা হয়নি। " +
+            "আবার নিবন্ধন করবেন না। এই UID সংরক্ষণ করুন: " +
+            createdUser.uid +
+            "। Admin-এর সহায়তা নিন।";
+        } else {
+          const messages = {
+            "auth/email-already-in-use": "এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে।",
+            "auth/invalid-email": "সঠিক ইমেইল ঠিকানা লিখুন।",
+            "auth/weak-password": "আরও শক্তিশালী পাসওয়ার্ড দিন।",
+            "auth/api-key-not-valid": "Firebase API Key যাচাই করুন।",
+            "auth/operation-not-allowed":
+              "Firebase Authentication-এ Email/Password চালু করুন।",
+            "auth/too-many-requests":
+              "অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পর আবার চেষ্টা করুন।"
+          };
+
+          message.textContent =
+            messages[error.code] ||
+            "নিবন্ধন ব্যর্থ হয়েছে। Error code: " +
+            (error.code || "unknown");
+        }
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
