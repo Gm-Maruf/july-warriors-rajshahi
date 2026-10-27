@@ -95,6 +95,17 @@
         <button id="logout-button" class="secondary">লগআউট</button>
       </div>
 
+<div class="panel">
+  <h2>নতুন সদস্যের আবেদন</h2>
+  <button id="reload-applications" class="secondary">
+    আবেদন তালিকা রিফ্রেশ
+  </button>
+  <div id="applications-status" class="status">
+    আবেদন লোড করা হয়নি।
+  </div>
+  <div id="applications-list"></div>
+</div>
+      
       <div class="panel">
         <h2>সদস্য ব্যবস্থাপনা</h2>
         <p>নিচে Firestore-এ সংরক্ষিত সদস্যদের তথ্য দেখা যাবে।</p>
@@ -199,6 +210,7 @@ var firebaseConfig = {
 
         loadMembers();
         loadSpecialNotices();
+        loadApplications();
       } catch (error) {
         loginPanel.classList.remove("hidden");
         loginStatus.textContent =
@@ -405,6 +417,115 @@ var firebaseConfig = {
 
     document.getElementById("reload-notices")
       .addEventListener("click", loadSpecialNotices);
+async function loadApplications() {
+  if (!currentAdmin) return;
+
+  var list = document.getElementById("applications-list");
+  var status = document.getElementById("applications-status");
+
+  list.replaceChildren();
+  status.textContent = "আবেদন লোড হচ্ছে...";
+
+  try {
+    var snapshot = await db.collection("memberApplications").get();
+
+    if (snapshot.empty) {
+      status.textContent = "এখন কোনো অপেক্ষমাণ আবেদন নেই।";
+      return;
+    }
+
+    status.textContent = "মোট আবেদন: " + snapshot.size;
+
+    snapshot.forEach(function(doc) {
+      var data = doc.data();
+      var card = document.createElement("div");
+      card.className = "member";
+
+      var title = document.createElement("strong");
+      title.textContent = data.name || "নাম দেওয়া হয়নি";
+      card.appendChild(title);
+
+      ["email", "phone", "address", "status"].forEach(function(field) {
+        var line = document.createElement("p");
+        line.textContent = field + ": " + (data[field] || "তথ্য নেই");
+        card.appendChild(line);
+      });
+
+      var actions = document.createElement("div");
+      actions.className = "actions";
+
+      var approve = document.createElement("button");
+      approve.textContent = "অনুমোদন করুন";
+      approve.addEventListener("click", async function() {
+        if (!currentAdmin) return;
+
+        if (!confirm((data.name || "এই আবেদনকারী") +
+          " -কে সদস্য হিসেবে অনুমোদন করবেন?")) return;
+
+        approve.disabled = true;
+
+        try {
+          var batch = db.batch();
+
+          batch.set(db.collection("members").doc(doc.id), {
+            name: data.name || "",
+            email: data.email || "",
+            phone: data.phone || "",
+            address: data.address || "",
+            photoURL: "",
+            role: "member"
+          });
+
+          batch.delete(db.collection("memberApplications").doc(doc.id));
+
+          await batch.commit();
+
+          alert("আবেদন অনুমোদিত হয়েছে।");
+          await loadApplications();
+          await loadMembers();
+        } catch (error) {
+          alert("অনুমোদন ব্যর্থ হয়েছে: " + error.message);
+          approve.disabled = false;
+        }
+      });
+
+      var reject = document.createElement("button");
+      reject.textContent = "প্রত্যাখ্যান করুন";
+      reject.className = "danger";
+
+      reject.addEventListener("click", async function() {
+        if (!currentAdmin) return;
+
+        if (!confirm(
+          "এই আবেদনটি প্রত্যাখ্যান করে মুছে ফেলবেন?\n" +
+          "এতে Firebase Authentication অ্যাকাউন্ট মুছবে না।"
+        )) return;
+
+        reject.disabled = true;
+
+        try {
+          await db.collection("memberApplications").doc(doc.id).delete();
+          alert("আবেদন প্রত্যাখ্যান করা হয়েছে।");
+          await loadApplications();
+        } catch (error) {
+          alert("প্রত্যাখ্যান ব্যর্থ হয়েছে: " + error.message);
+          reject.disabled = false;
+        }
+      });
+
+      actions.appendChild(approve);
+      actions.appendChild(reject);
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+  } catch (error) {
+    status.textContent = "আবেদন লোড করা যায়নি: " + error.message;
+  }
+}
+
+  document.getElementById("reload-applications")
+  .addEventListener("click", loadApplications);
+    
   </script>
 </body>
 </html>
