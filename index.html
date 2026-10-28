@@ -495,6 +495,94 @@ function loadMemberProfile(user) {
     });
 }
 
+    
+function loadSpecialNoticesForMember(user) {
+  var grid = document.getElementById('notice-grid');
+
+  // আগের Firebase নোটিশ সরিয়ে নতুন করে লোড করা হবে
+  grid.querySelectorAll('.firebase-special-notice')
+    .forEach(function(card) {
+      card.remove();
+    });
+
+  if (!user) {
+    refreshNoticeCards();
+    return;
+  }
+
+  firebase.firestore()
+    .collection('members')
+    .doc(user.uid)
+    .get()
+    .then(function(memberDoc) {
+      // অনুমোদিত সদস্যের রেকর্ড না থাকলে নোটিশ দেখাবে না
+      if (!memberDoc.exists) {
+  refreshNoticeCards();
+  return;
+}
+
+var memberData = memberDoc.data();
+
+if (
+  memberData.role !== 'member' &&
+  memberData.role !== 'admin'
+) {
+  refreshNoticeCards();
+  return;
+}
+
+      return firebase.firestore()
+        .collection('specialNotices')
+        .orderBy('createdAt', 'desc')
+        .get()
+        .then(function(snapshot) {
+          snapshot.forEach(function(doc) {
+            var data = doc.data();
+            var card = document.createElement('article');
+
+            card.className = 'notice firebase-special-notice';
+            card.setAttribute('data-notice-category', 'org');
+
+            var label = document.createElement('div');
+            label.className = 'notice-date';
+            label.textContent = 'বিশেষ নোটিশ';
+
+            var heading = document.createElement('h3');
+            heading.textContent = data.title || 'শিরোনাম নেই';
+
+            var content = document.createElement('p');
+            content.textContent = data.body || '';
+
+            card.appendChild(label);
+            card.appendChild(heading);
+            card.appendChild(content);
+
+            if (data.createdAt && data.createdAt.toDate) {
+              var date = document.createElement('small');
+              date.textContent = 'প্রকাশের তারিখ: ' +
+                data.createdAt.toDate().toLocaleDateString('bn-BD');
+              card.appendChild(date);
+            }
+
+            grid.appendChild(card);
+          });
+
+          refreshNoticeCards();
+        });
+    })
+    .catch(function(error) {
+      console.error('বিশেষ নোটিশ লোড করা যায়নি:', error);
+    });
+}
+
+function refreshNoticeCards() {
+  noticeCards = Array.from(
+    document.querySelectorAll('#notice-grid .notice')
+  );
+  filterNotices();
+}
+
+
 firebase.auth().onAuthStateChanged(function(user) {
 console.log('Firebase auth state:', user ? user.uid : 'SIGNED OUT');
   
@@ -503,12 +591,14 @@ console.log('Firebase auth state:', user ? user.uid : 'SIGNED OUT');
   const message = document.getElementById('login-message');
 
   if (user) {
-    loadMemberProfile(user);
-  } else {
-    profile.hidden = true;
-    loginForm.hidden = false;
-    message.textContent = '';
-  }
+  loadMemberProfile(user);
+  loadSpecialNoticesForMember(user);
+} else {
+  profile.hidden = true;
+  loginForm.hidden = false;
+  message.textContent = '';
+  loadSpecialNoticesForMember(null);
+}
 });
 
 
