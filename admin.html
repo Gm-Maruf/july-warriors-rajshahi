@@ -115,14 +115,39 @@
       </div>
 
       <div class="panel">
-        <h2>বিশেষ নোটিশ প্রকাশ</h2>
-        <form id="notice-form">
-          <input id="notice-title" maxlength="150" placeholder="নোটিশের শিরোনাম" required>
-          <textarea id="notice-body" maxlength="5000" placeholder="নোটিশের বিস্তারিত" required></textarea>
-          <button type="submit">নোটিশ প্রকাশ করুন</button>
-        </form>
-        <div id="notice-status" class="status" role="status"></div>
-      </div>
+  <h2>বিশেষ নোটিশ প্রকাশ</h2>
+  <form id="notice-form">
+    <input
+      id="notice-title"
+      maxlength="150"
+      placeholder="নোটিশের শিরোনাম"
+      required
+    >
+
+    <textarea
+      id="notice-body"
+      maxlength="5000"
+      placeholder="নোটিশের বিস্তারিত"
+      required
+    ></textarea>
+
+    <div class="actions">
+      <button id="notice-submit" type="submit">
+        নোটিশ প্রকাশ করুন
+      </button>
+
+      <button
+        id="notice-cancel"
+        type="button"
+        class="secondary hidden"
+      >
+        সম্পাদনা বাতিল
+      </button>
+    </div>
+  </form>
+
+  <div id="notice-status" class="status" role="status"></div>
+</div>
 
       <div class="panel">
         <h2>বিশেষ নোটিশ ব্যবস্থাপনা</h2>
@@ -339,22 +364,70 @@ var firebaseConfig = {
 
     document.getElementById("reload-members").addEventListener("click", loadMembers);
 
-    document.getElementById("notice-form").addEventListener("submit", async function(e) {
-      e.preventDefault();
-      if (!currentAdmin) return;
+    
+var editingNoticeId = null;
 
-      var title = document.getElementById("notice-title").value.trim();
-      var body = document.getElementById("notice-body").value.trim();
-      var status = document.getElementById("notice-status");
+function resetNoticeEditor() {
+  editingNoticeId = null;
 
-      if (!title || !body) {
-        status.textContent = "শিরোনাম ও বিস্তারিত লিখুন।";
-        return;
-      }
+  document.getElementById("notice-form").reset();
 
-      status.textContent = "নোটিশ প্রকাশ হচ্ছে...";
+  document.getElementById("notice-submit").textContent =
+    "নোটিশ প্রকাশ করুন";
 
-      try {
+  document.getElementById("notice-cancel").classList.add("hidden");
+
+  document.getElementById("notice-status").textContent =
+    "সম্পাদনা বাতিল করা হয়েছে।";
+}
+
+document.getElementById("notice-cancel")
+  .addEventListener("click", resetNoticeEditor);
+
+document.getElementById("notice-form")
+  .addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!currentAdmin) {
+      document.getElementById("notice-status").textContent =
+        "নোটিশ পরিচালনার জন্য Admin হিসেবে লগইন করুন।";
+      return;
+    }
+
+    var title = document.getElementById("notice-title").value.trim();
+    var body = document.getElementById("notice-body").value.trim();
+    var status = document.getElementById("notice-status");
+    var submitButton = document.getElementById("notice-submit");
+
+    if (!title || !body) {
+      status.textContent = "শিরোনাম ও বিস্তারিত লিখুন।";
+      return;
+    }
+
+    submitButton.disabled = true;
+
+    try {
+      if (editingNoticeId) {
+        status.textContent = "নোটিশ আপডেট হচ্ছে...";
+
+        await db.collection("specialNotices")
+          .doc(editingNoticeId)
+          .update({
+            title: title,
+            body: body,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            updatedBy: currentAdmin.uid
+          });
+
+        editingNoticeId = null;
+        document.getElementById("notice-form").reset();
+        submitButton.textContent = "নোটিশ প্রকাশ করুন";
+        document.getElementById("notice-cancel").classList.add("hidden");
+
+        status.textContent = "নোটিশ সফলভাবে আপডেট হয়েছে।";
+      } else {
+        status.textContent = "নোটিশ প্রকাশ হচ্ছে...";
+
         await db.collection("specialNotices").add({
           title: title,
           body: body,
@@ -364,59 +437,123 @@ var firebaseConfig = {
 
         document.getElementById("notice-form").reset();
         status.textContent = "বিশেষ নোটিশ প্রকাশ হয়েছে।";
-        loadSpecialNotices();
-      } catch (error) {
-        status.textContent = "নোটিশ প্রকাশ করা যায়নি: " + error.message;
       }
-    });
 
-    async function loadSpecialNotices() {
-      if (!currentAdmin) return;
+      await loadSpecialNotices();
+    } catch (error) {
+      status.textContent =
+        "নোটিশ সংরক্ষণ করা যায়নি: " + error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
 
-      var list = document.getElementById("special-notices-list");
-      list.replaceChildren();
+async function loadSpecialNotices() {
+  if (!currentAdmin) return;
 
-      try {
-        var snapshot = await db.collection("specialNotices")
-          .orderBy("createdAt", "desc").get();
+  var list = document.getElementById("special-notices-list");
+  list.replaceChildren();
 
-        snapshot.forEach(function(doc) {
-          var data = doc.data();
-          var card = document.createElement("div");
-          card.className = "notice";
+  try {
+    var snapshot = await db.collection("specialNotices")
+      .orderBy("createdAt", "desc")
+      .get();
 
-          var heading = document.createElement("strong");
-          heading.textContent = data.title || "শিরোনাম নেই";
-          card.appendChild(heading);
-
-          var content = document.createElement("p");
-          content.textContent = data.body || "";
-          card.appendChild(content);
-
-          var remove = document.createElement("button");
-          remove.textContent = "নোটিশ মুছুন";
-          remove.className = "danger";
-          remove.addEventListener("click", async function() {
-            if (!confirm("এই বিশেষ নোটিশটি মুছে ফেলবেন?")) return;
-
-            try {
-              await db.collection("specialNotices").doc(doc.id).delete();
-              loadSpecialNotices();
-            } catch (error) {
-              alert("নোটিশ মুছতে সমস্যা হয়েছে: " + error.message);
-            }
-          });
-
-          card.appendChild(remove);
-          list.appendChild(card);
-        });
-      } catch (error) {
-        list.textContent = "নোটিশ লোড করা যায়নি: " + error.message;
-      }
+    if (snapshot.empty) {
+      list.textContent = "এখন কোনো বিশেষ নোটিশ নেই।";
+      return;
     }
 
-    document.getElementById("reload-notices")
-      .addEventListener("click", loadSpecialNotices);
+    snapshot.forEach(function(doc) {
+      var data = doc.data();
+      var card = document.createElement("div");
+      card.className = "notice";
+
+      var heading = document.createElement("strong");
+      heading.textContent = data.title || "শিরোনাম নেই";
+      card.appendChild(heading);
+
+      var content = document.createElement("p");
+      content.textContent = data.body || "";
+      card.appendChild(content);
+
+      var actions = document.createElement("div");
+      actions.className = "actions";
+
+      var edit = document.createElement("button");
+      edit.type = "button";
+      edit.textContent = "সম্পাদনা";
+
+      edit.addEventListener("click", function() {
+        if (!currentAdmin) return;
+
+        editingNoticeId = doc.id;
+
+        document.getElementById("notice-title").value =
+          data.title || "";
+
+        document.getElementById("notice-body").value =
+          data.body || "";
+
+        document.getElementById("notice-submit").textContent =
+          "আপডেট করুন";
+
+        document.getElementById("notice-cancel")
+          .classList.remove("hidden");
+
+        document.getElementById("notice-status").textContent =
+          "সম্পাদনা মোড: নোটিশ পরিবর্তন করে আপডেট করুন।";
+
+        document.getElementById("notice-form")
+          .scrollIntoView({ behavior: "smooth", block: "center" });
+
+        document.getElementById("notice-title").focus();
+      });
+
+      actions.appendChild(edit);
+
+      var remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "নোটিশ মুছুন";
+      remove.className = "danger";
+
+      remove.addEventListener("click", async function() {
+        if (!currentAdmin) return;
+
+        if (!confirm("এই বিশেষ নোটিশটি মুছে ফেলবেন?")) return;
+
+        remove.disabled = true;
+
+        try {
+          await db.collection("specialNotices").doc(doc.id).delete();
+
+          if (editingNoticeId === doc.id) {
+            resetNoticeEditor();
+          }
+
+          document.getElementById("notice-status").textContent =
+            "নোটিশ মুছে ফেলা হয়েছে।";
+
+          await loadSpecialNotices();
+        } catch (error) {
+          alert("নোটিশ মুছতে সমস্যা হয়েছে: " + error.message);
+          remove.disabled = false;
+        }
+      });
+
+      actions.appendChild(remove);
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+  } catch (error) {
+    list.textContent =
+      "নোটিশ লোড করা যায়নি: " + error.message;
+  }
+}
+
+document.getElementById("reload-notices")
+  .addEventListener("click", loadSpecialNotices);
+
 async function loadApplications() {
   if (!currentAdmin) return;
 
