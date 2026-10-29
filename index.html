@@ -496,10 +496,16 @@ function loadMemberProfile(user) {
 }
 
     
+var specialNoticesUnsubscribe = null;
+
 function loadSpecialNoticesForMember(user) {
   var grid = document.getElementById('notice-grid');
 
-  // আগের Firebase নোটিশ সরিয়ে নতুন করে লোড করা হবে
+  if (specialNoticesUnsubscribe) {
+    specialNoticesUnsubscribe();
+    specialNoticesUnsubscribe = null;
+  }
+
   grid.querySelectorAll('.firebase-special-notice')
     .forEach(function(card) {
       card.remove();
@@ -515,27 +521,30 @@ function loadSpecialNoticesForMember(user) {
     .doc(user.uid)
     .get()
     .then(function(memberDoc) {
-      // অনুমোদিত সদস্যের রেকর্ড না থাকলে নোটিশ দেখাবে না
       if (!memberDoc.exists) {
-  refreshNoticeCards();
-  return;
-}
+        refreshNoticeCards();
+        return;
+      }
 
-var memberData = memberDoc.data();
+      var memberData = memberDoc.data();
 
-if (
-  memberData.role !== 'member' &&
-  memberData.role !== 'admin'
-) {
-  refreshNoticeCards();
-  return;
-}
+      if (
+        memberData.role !== 'member' &&
+        memberData.role !== 'admin'
+      ) {
+        refreshNoticeCards();
+        return;
+      }
 
-      return firebase.firestore()
+      specialNoticesUnsubscribe = firebase.firestore()
         .collection('specialNotices')
         .orderBy('createdAt', 'desc')
-        .get()
-        .then(function(snapshot) {
+        .onSnapshot(function(snapshot) {
+          grid.querySelectorAll('.firebase-special-notice')
+            .forEach(function(card) {
+              card.remove();
+            });
+
           snapshot.forEach(function(doc) {
             var data = doc.data();
             var card = document.createElement('article');
@@ -568,13 +577,14 @@ if (
           });
 
           refreshNoticeCards();
+        }, function(error) {
+          console.error('বিশেষ নোটিশ আপডেট করা যায়নি:', error);
         });
     })
     .catch(function(error) {
-      console.error('বিশেষ নোটিশ লোড করা যায়নি:', error);
+      console.error('সদস্য যাচাই বা নোটিশ লোড করা যায়নি:', error);
     });
 }
-
 function refreshNoticeCards() {
   noticeCards = Array.from(
     document.querySelectorAll('#notice-grid .notice')
