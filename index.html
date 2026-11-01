@@ -427,6 +427,13 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+// লগইন শুধু বর্তমান ব্রাউজার সেশনের জন্য
+firebase.auth().setPersistence(
+  firebase.auth.Auth.Persistence.SESSION
+).catch(function(error) {
+  console.error('Session persistence error:', error);
+});
 </script>
 
   
