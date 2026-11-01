@@ -129,12 +129,49 @@
           <hr>
 
           <h3>২. কার্যক্রম</h3>
-          <form id="activities-content-form">
-            <input id="activities-title" placeholder="শিরোনাম">
-            <input id="activities-subtitle" placeholder="উপশিরোনাম">
-            <textarea id="activities-items" placeholder="কার্যক্রমের তথ্য: প্রতি লাইনে শিরোনাম | বিবরণ"></textarea>
-            <button type="submit">কার্যক্রম সংরক্ষণ</button>
-          </form>
+
+<form id="activities-content-form">
+  <input id="activities-title" placeholder="শিরোনাম">
+  <input id="activities-subtitle" placeholder="উপশিরোনাম">
+
+  <hr>
+
+  <h4>নতুন কার্যক্রম যোগ করুন</h4>
+
+  <input
+    id="activity-item-title"
+    placeholder="কার্যক্রমের শিরোনাম"
+  >
+
+  <textarea
+    id="activity-item-description"
+    placeholder="কার্যক্রমের বিস্তারিত বিবরণ"
+  ></textarea>
+
+  <div class="actions">
+    <button id="activity-item-submit" type="button">
+      কার্যক্রম যোগ করুন
+    </button>
+
+    <button
+      id="activity-item-cancel"
+      type="button"
+      class="secondary hidden"
+    >
+      সম্পাদনা বাতিল
+    </button>
+  </div>
+
+  <h4>বর্তমান কার্যক্রমের তালিকা</h4>
+
+  <div id="activities-items-list">
+    কার্যক্রম লোড হচ্ছে...
+  </div>
+
+  <hr>
+
+  <button type="submit">সব কার্যক্রম সংরক্ষণ করুন</button>
+</form>
 
           <hr>
 
@@ -755,6 +792,124 @@ function formatItems(items, fields) {
   }).join("\n");
 }
 
+// ======================================
+// ACTIVITIES CREATE, EDIT AND DELETE
+// ======================================
+
+var activitiesItems = [];
+var editingActivityIndex = -1;
+
+function renderActivitiesItems() {
+  var list = document.getElementById("activities-items-list");
+  list.replaceChildren();
+
+  if (activitiesItems.length === 0) {
+    list.textContent = "এখনো কোনো কার্যক্রম যোগ করা হয়নি।";
+    return;
+  }
+
+  activitiesItems.forEach(function(item, index) {
+    var card = document.createElement("div");
+    card.className = "notice";
+
+    var heading = document.createElement("strong");
+    heading.textContent = "কার্যক্রম " + (index + 1) + ": " + item.title;
+    card.appendChild(heading);
+
+    var description = document.createElement("p");
+    description.textContent = item.description;
+    card.appendChild(description);
+
+    var actions = document.createElement("div");
+    actions.className = "actions";
+
+    var edit = document.createElement("button");
+    edit.type = "button";
+    edit.textContent = "সম্পাদনা";
+
+    edit.addEventListener("click", function() {
+      editingActivityIndex = index;
+
+      document.getElementById("activity-item-title").value =
+        item.title || "";
+
+      document.getElementById("activity-item-description").value =
+        item.description || "";
+
+      document.getElementById("activity-item-submit").textContent =
+        "পরিবর্তন আপডেট করুন";
+
+      document.getElementById("activity-item-cancel")
+        .classList.remove("hidden");
+
+      document.getElementById("activity-item-title")
+        .scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    var remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "মুছে ফেলুন";
+    remove.className = "danger";
+
+    remove.addEventListener("click", function() {
+      if (!confirm("এই কার্যক্রমটি মুছে ফেলতে চান?")) return;
+
+      activitiesItems.splice(index, 1);
+      editingActivityIndex = -1;
+
+      renderActivitiesItems();
+      resetActivityEditor();
+    });
+
+    actions.appendChild(edit);
+    actions.appendChild(remove);
+
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
+}
+
+function resetActivityEditor() {
+  editingActivityIndex = -1;
+
+  document.getElementById("activity-item-title").value = "";
+  document.getElementById("activity-item-description").value = "";
+
+  document.getElementById("activity-item-submit").textContent =
+    "কার্যক্রম যোগ করুন";
+
+  document.getElementById("activity-item-cancel")
+    .classList.add("hidden");
+}
+
+document.getElementById("activity-item-submit")
+  .addEventListener("click", function() {
+    var title = document.getElementById("activity-item-title").value.trim();
+    var description = document.getElementById("activity-item-description").value.trim();
+
+    if (!title || !description) {
+      alert("কার্যক্রমের শিরোনাম ও বিবরণ লিখুন।");
+      return;
+    }
+
+    var item = {
+      title: title,
+      description: description
+    };
+
+    if (editingActivityIndex >= 0) {
+      activitiesItems[editingActivityIndex] = item;
+    } else {
+      activitiesItems.push(item);
+    }
+
+    renderActivitiesItems();
+    resetActivityEditor();
+  });
+
+document.getElementById("activity-item-cancel")
+  .addEventListener("click", resetActivityEditor);
+    
 async function loadSiteContent() {
   if (!currentAdmin) return;
 
@@ -781,10 +936,24 @@ async function loadSiteContent() {
       Array.isArray(about.points) ? about.points.join("\n") : "";
 
     var activities = data.activities || {};
-    document.getElementById("activities-title").value = activities.title || "";
-    document.getElementById("activities-subtitle").value = activities.subtitle || "";
-    document.getElementById("activities-items").value =
-      formatItems(activities.items, ["title", "description"]);
+
+document.getElementById("activities-title").value =
+  activities.title || "";
+
+document.getElementById("activities-subtitle").value =
+  activities.subtitle || "";
+
+activitiesItems = Array.isArray(activities.items)
+  ? activities.items.map(function(item) {
+      return {
+        title: item.title || "",
+        description: item.description || ""
+      };
+    })
+  : [];
+
+renderActivitiesItems();
+resetActivityEditor();
 
     var notices = data.notices || {};
     document.getElementById("public-notices-title").value = notices.title || "";
@@ -851,6 +1020,7 @@ document.getElementById("about-content-form")
   });
 
 // Activities section
+// Activities section
 document.getElementById("activities-content-form")
   .addEventListener("submit", function(e) {
     e.preventDefault();
@@ -858,10 +1028,7 @@ document.getElementById("activities-content-form")
     saveSiteSection("activities", {
       title: document.getElementById("activities-title").value.trim(),
       subtitle: document.getElementById("activities-subtitle").value.trim(),
-      items: parseItems(
-        document.getElementById("activities-items").value,
-        ["title", "description"]
-      )
+      items: activitiesItems
     }, "activities-content-form");
   });
 
