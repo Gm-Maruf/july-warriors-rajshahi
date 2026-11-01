@@ -291,6 +291,7 @@ var firebaseConfig = {
         loadMembers();
         loadSpecialNotices();
         loadApplications();
+        loadSiteContent();
       } catch (error) {
         loginPanel.classList.remove("hidden");
         loginStatus.textContent =
@@ -717,6 +718,182 @@ async function loadApplications() {
 
   document.getElementById("reload-applications")
   .addEventListener("click", loadApplications);
+
+// ======================================
+// WEBSITE CONTENT MANAGEMENT
+// ======================================
+
+var siteContentRef = db.collection("siteContent").doc("publicSections");
+
+function linesToList(value) {
+  return value.split("\n")
+    .map(function(line) { return line.trim(); })
+    .filter(function(line) { return line.length > 0; });
+}
+
+function parseItems(value, fields) {
+  return linesToList(value).map(function(line) {
+    var parts = line.split("|").map(function(part) {
+      return part.trim();
+    });
+
+    var item = {};
+    fields.forEach(function(field, index) {
+      item[field] = parts[index] || "";
+    });
+    return item;
+  });
+}
+
+function formatItems(items, fields) {
+  if (!Array.isArray(items)) return "";
+
+  return items.map(function(item) {
+    return fields.map(function(field) {
+      return item[field] || "";
+    }).join(" | ");
+  }).join("\n");
+}
+
+async function loadSiteContent() {
+  if (!currentAdmin) return;
+
+  var status = document.getElementById("content-management-status");
+  status.textContent = "ওয়েবসাইটের কনটেন্ট লোড হচ্ছে...";
+
+  try {
+    var snapshot = await siteContentRef.get();
+
+    if (!snapshot.exists) {
+      status.textContent =
+        "এখনো কোনো কনটেন্ট সংরক্ষণ করা হয়নি। নতুন তথ্য লিখে Save করুন।";
+      return;
+    }
+
+    var data = snapshot.data();
+
+    var about = data.about || {};
+    document.getElementById("about-title").value = about.title || "";
+    document.getElementById("about-subtitle").value = about.subtitle || "";
+    document.getElementById("about-description").value = about.description || "";
+    document.getElementById("about-description2").value = about.description2 || "";
+    document.getElementById("about-points").value =
+      Array.isArray(about.points) ? about.points.join("\n") : "";
+
+    var activities = data.activities || {};
+    document.getElementById("activities-title").value = activities.title || "";
+    document.getElementById("activities-subtitle").value = activities.subtitle || "";
+    document.getElementById("activities-items").value =
+      formatItems(activities.items, ["title", "description"]);
+
+    var notices = data.notices || {};
+    document.getElementById("public-notices-title").value = notices.title || "";
+    document.getElementById("public-notices-subtitle").value = notices.subtitle || "";
+    document.getElementById("public-notices-items").value =
+      formatItems(notices.items, ["title", "body", "date", "category"]);
+
+    var contact = data.contact || {};
+    document.getElementById("contact-title").value = contact.title || "";
+    document.getElementById("contact-description").value = contact.description || "";
+    document.getElementById("contact-phone").value = contact.phone || "";
+    document.getElementById("contact-email").value = contact.email || "";
+    document.getElementById("contact-address").value = contact.address || "";
+
+    status.textContent = "সংরক্ষিত কনটেন্ট লোড হয়েছে।";
+  } catch (error) {
+    status.textContent = "কনটেন্ট লোড করা যায়নি: " + error.message;
+    console.error(error);
+  }
+}
+
+async function saveSiteSection(section, content, formId) {
+  if (!currentAdmin) {
+    alert("প্রথমে Admin হিসেবে লগইন করুন।");
+    return;
+  }
+
+  var status = document.getElementById("content-management-status");
+  var button = document.querySelector("#" + formId + " button[type='submit']");
+
+  button.disabled = true;
+  status.textContent = "তথ্য Firebase-এ সংরক্ষণ হচ্ছে...";
+
+  try {
+    var update = {};
+    update[section] = content;
+    update.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    update.updatedBy = currentAdmin.uid;
+
+    await siteContentRef.set(update, { merge: true });
+
+    status.textContent = "সফলভাবে সংরক্ষণ হয়েছে: " + section;
+    alert("তথ্য সফলভাবে Firebase-এ সংরক্ষণ হয়েছে।");
+  } catch (error) {
+    status.textContent = "সংরক্ষণ ব্যর্থ হয়েছে: " + error.message;
+    console.error(error);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+// About section
+document.getElementById("about-content-form")
+  .addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    saveSiteSection("about", {
+      title: document.getElementById("about-title").value.trim(),
+      subtitle: document.getElementById("about-subtitle").value.trim(),
+      description: document.getElementById("about-description").value.trim(),
+      description2: document.getElementById("about-description2").value.trim(),
+      points: linesToList(document.getElementById("about-points").value)
+    }, "about-content-form");
+  });
+
+// Activities section
+document.getElementById("activities-content-form")
+  .addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    saveSiteSection("activities", {
+      title: document.getElementById("activities-title").value.trim(),
+      subtitle: document.getElementById("activities-subtitle").value.trim(),
+      items: parseItems(
+        document.getElementById("activities-items").value,
+        ["title", "description"]
+      )
+    }, "activities-content-form");
+  });
+
+// Public notices section
+document.getElementById("public-notices-content-form")
+  .addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    saveSiteSection("notices", {
+      title: document.getElementById("public-notices-title").value.trim(),
+      subtitle: document.getElementById("public-notices-subtitle").value.trim(),
+      items: parseItems(
+        document.getElementById("public-notices-items").value,
+        ["title", "body", "date", "category"]
+      )
+    }, "public-notices-content-form");
+  });
+
+// Contact section
+document.getElementById("contact-content-form")
+  .addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    saveSiteSection("contact", {
+      title: document.getElementById("contact-title").value.trim(),
+      description: document.getElementById("contact-description").value.trim(),
+      phone: document.getElementById("contact-phone").value.trim(),
+      email: document.getElementById("contact-email").value.trim(),
+      address: document.getElementById("contact-address").value.trim()
+    }, "contact-content-form");
+  });
+
     
   </script>
 </body>
