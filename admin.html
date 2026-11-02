@@ -7,62 +7,375 @@
   <title>Admin Panel | আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</title>
 
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-      color: #172033;
-    }
-    header {
-      background: #102d50;
-      color: white;
-      padding: 22px 16px;
-      text-align: center;
-    }
-    header h1 { margin: 0 0 8px; font-size: 23px; }
-    header p { margin: 0; }
-    main { max-width: 1000px; margin: 25px auto; padding: 0 15px; }
-    .panel {
-      background: white;
-      border-radius: 12px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 14px #102d5012;
-    }
-    h2 { margin-top: 0; color: #102d50; }
-    input, textarea, button {
-      width: 100%;
-      padding: 11px;
-      margin: 6px 0;
-      border-radius: 7px;
-      border: 1px solid #cbd5e1;
-      font: inherit;
-    }
-    textarea { min-height: 95px; resize: vertical; }
-    button {
-      background: #123e6a;
-      color: white;
-      border: 0;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:disabled { opacity: .6; cursor: wait; }
-    .secondary { background: #475569; }
-    .danger { background: #b42318; }
-    .hidden { display: none !important; }
-    .status { padding: 10px 0; overflow-wrap: anywhere; }
-    .member, .notice {
-      border: 1px solid #dbe3ed;
-      padding: 13px;
-      margin: 10px 0;
-      border-radius: 8px;
-      overflow-wrap: anywhere;
-    }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions button { width: auto; }
-    a { color: #dbeafe; }
-    footer { text-align: center; padding: 20px; color: #64748b; }
+    
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --navy: #10243e;
+  --navy-light: #183858;
+  --blue: #2563eb;
+  --blue-light: #eff6ff;
+  --bg: #f4f7fb;
+  --white: #ffffff;
+  --text: #172b45;
+  --muted: #64748b;
+  --border: #e2e8f0;
+  --green: #15803d;
+  --red: #dc2626;
+  --shadow: 0 8px 28px rgba(15, 35, 65, .07);
+}
+
+body {
+  margin: 0;
+  font-family: Arial, "Noto Sans Bengali", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* HEADER */
+
+header {
+  background: linear-gradient(120deg, #10243e, #1d4772);
+  color: white;
+  padding: 30px 20px;
+  text-align: left;
+  box-shadow: 0 5px 20px rgba(16, 36, 62, .15);
+}
+
+header h1 {
+  max-width: 1100px;
+  margin: auto;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+header p {
+  max-width: 1100px;
+  margin: 5px auto 0;
+  color: #cbdcf0;
+  font-size: 14px;
+}
+
+header a {
+  color: #bfdbfe;
+  text-decoration: none;
+}
+
+header a:hover {
+  color: white;
+}
+
+/* MAIN LAYOUT */
+
+main {
+  max-width: 1180px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+#admin-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* PANELS */
+
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 0;
+  box-shadow: var(--shadow);
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  color: var(--navy);
+  font-size: 21px;
+  font-weight: 750;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel h3 {
+  color: #24496f;
+  font-size: 18px;
+  margin-top: 25px;
+}
+
+.panel h4 {
+  color: var(--text);
+  font-size: 15px;
+}
+
+/* LOGIN */
+
+#login-panel {
+  max-width: 470px;
+  margin: 70px auto;
+  padding: 35px;
+  border-top: 5px solid var(--blue);
+}
+
+#login-panel h2 {
+  font-size: 25px;
+}
+
+#login-panel p {
+  color: var(--muted);
+}
+
+/* FORM ELEMENTS */
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 13px 14px;
+  margin: 7px 0 13px;
+  border: 1px solid #d5deea;
+  border-radius: 9px;
+  background: #fbfdff;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: .2s;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--blue);
+  background: white;
+  box-shadow: 0 0 0 3px #2563eb18;
+}
+
+textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* BUTTONS */
+
+button {
+  width: 100%;
+  padding: 12px 17px;
+  margin: 6px 0;
+  border: 0;
+  border-radius: 9px;
+  background: var(--blue);
+  color: white;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: .2s;
+}
+
+button:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px #2563eb25;
+}
+
+button:disabled {
+  opacity: .55;
+  cursor: wait;
+  transform: none;
+}
+
+.secondary {
+  background: #475569;
+}
+
+.secondary:hover {
+  background: #334155;
+}
+
+.danger {
+  background: var(--red);
+}
+
+.danger:hover {
+  background: #b91c1c;
+}
+
+/* ACTION BUTTONS */
+
+.actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.actions button {
+  width: auto;
+  min-width: 115px;
+  flex: 0 1 auto;
+}
+
+/* MEMBER AND NOTICE CARDS */
+
+.member,
+.notice {
+  background: #fbfdff;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--blue);
+  padding: 18px;
+  margin: 13px 0;
+  border-radius: 11px;
+  overflow-wrap: anywhere;
+  transition: .2s;
+}
+
+.member:hover,
+.notice:hover {
+  box-shadow: 0 5px 18px rgba(15, 35, 65, .06);
+  border-color: #bfdbfe;
+}
+
+.member strong,
+.notice strong {
+  display: block;
+  color: var(--navy);
+  font-size: 16px;
+  margin-bottom: 9px;
+}
+
+.member p,
+.notice p {
+  margin: 5px 0;
+  color: #52657d;
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+/* STATUS */
+
+.status {
+  padding: 12px 14px;
+  margin: 10px 0;
+  background: var(--blue-light);
+  border-radius: 8px;
+  color: #1e40af;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* DIVIDERS */
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 25px 0;
+}
+
+/* CONTENT MANAGEMENT */
+
+#content-management-list {
+  padding-top: 10px;
+}
+
+#content-management-list h3 {
+  padding: 12px 14px;
+  background: #f1f6fd;
+  border-left: 4px solid var(--blue);
+  border-radius: 7px;
+}
+
+#content-management-list form {
+  padding: 8px 0 15px;
+}
+
+/* APPLICATIONS AND MEMBERS */
+
+#applications-list,
+#members-list,
+#special-notices-list,
+#activities-items-list {
+  margin-top: 15px;
+}
+
+/* FOOTER */
+
+footer {
+  text-align: center;
+  padding: 25px 15px;
+  margin-top: 40px;
+  background: var(--navy);
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (min-width: 900px) {
+  #admin-panel > .panel:first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  #admin-panel > .panel:first-child h2 {
+    border: 0;
+    margin: 0;
+  }
+
+  #admin-panel > .panel:first-child button {
+    width: auto;
+    min-width: 130px;
+  }
+}
+
+@media (max-width: 600px) {
+  header {
+    padding: 23px 17px;
+  }
+
+  header h1 {
+    font-size: 19px;
+  }
+
+  main {
+    margin: 18px auto;
+    padding: 0 12px;
+  }
+
+  .panel {
+    padding: 17px;
+    border-radius: 12px;
+  }
+
+  .panel h2 {
+    font-size: 18px;
+  }
+
+  #login-panel {
+    margin: 35px auto;
+    padding: 23px;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
