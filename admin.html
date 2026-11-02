@@ -1073,8 +1073,12 @@ document.getElementById("new-member-form")
   var navButtons = document.querySelectorAll("[data-view]");
   var views = document.querySelectorAll(".main-area .view");
   function openView(viewId) {
+    // The three member screens are nested inside members-view.
+    // Keep their parent section visible while switching between them.
+    var isMemberSubView = ["existing-member-view", "new-member-view", "member-list-view"].includes(viewId);
     views.forEach(function(view) {
-      view.classList.toggle("active", view.id === viewId);
+      var shouldShow = view.id === viewId || (isMemberSubView && view.id === "members-view");
+      view.classList.toggle("active", shouldShow);
     });
     navButtons.forEach(function(button) {
       var isActive = button.getAttribute("data-view") === viewId;
