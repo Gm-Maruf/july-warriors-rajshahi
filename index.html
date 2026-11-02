@@ -384,6 +384,64 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
 </div>
 <div class="modal-backdrop" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title" onclick="backdropClose(event)"><div class="modal"><div class="modal-head"><div><div class="kicker">সদস্য এলাকা</div><h2 id="login-title">সদস্য লগইন</h2></div><button class="close" aria-label="বন্ধ করুন" onclick="closeLogin()">✕</button></div><p style="color:var(--muted);font-size:14px">সদস্যদের জন্য নির্ধারিত প্রবেশদ্বার।</p><form id="member-login-form" onsubmit="demoLogin(event)"><label class="form-label" for="member-user">ইমেইল</label><input class="form-input" id="member-user" type="email" autocomplete="username" placeholder="আপনার ইমেইল ঠিকানা" required><label class="form-label" for="member-pass">পাসওয়ার্ড</label><input class="form-input" id="member-pass" type="password" autocomplete="current-password" placeholder="আপনার পাসওয়ার্ড" required><div class="form-note">সদস্যদের তথ্য নিরাপদভাবে দেখতে লগইন করুন</div><button class="btn btn-primary" type="submit" style="width:100%">প্রিভিউ পরীক্ষা করুন</button><div id="login-message" role="status"></div></form>
 
+<p style="text-align:center;font-size:13px;margin-top:15px">
+  নতুন সদস্য?
+  <a href="#" onclick="showRegistration();return false;">
+    রেজিস্ট্রেশন করুন
+  </a>
+</p>
+  
+<div id="register-section" hidden>
+
+  <h3>নতুন সদস্য নিবন্ধন</h3>
+
+  <form id="member-register-form">
+
+    <label class="form-label" for="register-name">পূর্ণ নাম</label>
+    <input class="form-input" id="register-name"
+      type="text" maxlength="100" required>
+
+    <label class="form-label" for="register-email">ইমেইল</label>
+    <input class="form-input" id="register-email"
+      type="email" maxlength="254" required>
+
+    <label class="form-label" for="register-phone">মোবাইল নম্বর</label>
+    <input class="form-input" id="register-phone"
+      type="tel" maxlength="30" required>
+
+    <label class="form-label" for="register-address">ঠিকানা</label>
+    <input class="form-input" id="register-address"
+      type="text" maxlength="500" required>
+
+    <label class="form-label" for="register-password">পাসওয়ার্ড</label>
+    <input class="form-input" id="register-password"
+      type="password" minlength="6"
+      autocomplete="new-password" required>
+
+    <label class="form-label" for="register-password-confirm">
+      পাসওয়ার্ড পুনরায় লিখুন
+    </label>
+    <input class="form-input" id="register-password-confirm"
+      type="password" minlength="6"
+      autocomplete="new-password" required>
+
+    <button class="btn btn-primary" type="submit"
+      style="width:100%;margin-top:16px">
+      রেজিস্ট্রেশন আবেদন জমা দিন
+    </button>
+
+    <div id="register-message" role="status"></div>
+
+  </form>
+
+  <button class="btn btn-outline" type="button"
+    style="width:100%;margin-top:12px"
+    onclick="showMemberLogin()">
+    লগইন পেজে ফিরে যান
+  </button>
+
+</div>
+  
 <div id="member-profile" hidden>
   <h3>আমার সদস্য-তথ্য</h3>
 
@@ -456,6 +514,22 @@ function closeLogin(){document.getElementById('login-modal').classList.remove('o
 function backdropClose(e){if(e.target.id==='login-modal')closeLogin();}
 function toggleMenu(){document.getElementById('navlinks').classList.toggle('open');}
 
+
+var registrationInProgress = false;
+
+function showRegistration() {
+  document.getElementById('member-login-form').hidden = true;
+  document.getElementById('member-profile').hidden = true;
+  document.getElementById('register-section').hidden = false;
+  document.getElementById('login-message').textContent = '';
+}
+
+function showMemberLogin() {
+  document.getElementById('register-section').hidden = true;
+  document.getElementById('member-profile').hidden = true;
+  document.getElementById('member-login-form').hidden = false;
+  document.getElementById('login-message').textContent = '';
+}
     
   
 function demoLogin(e) {
@@ -514,6 +588,73 @@ function loadMemberProfile(user) {
         'সদস্যের তথ্য লোড করা যায়নি: ' + error.code;
     });
 }
+
+    document.getElementById('member-register-form')
+  .addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var name = document.getElementById('register-name').value.trim();
+    var email = document.getElementById('register-email').value.trim();
+    var phone = document.getElementById('register-phone').value.trim();
+    var address = document.getElementById('register-address').value.trim();
+    var password = document.getElementById('register-password').value;
+    var confirmPassword =
+      document.getElementById('register-password-confirm').value;
+
+    var message = document.getElementById('register-message');
+
+    if (password !== confirmPassword) {
+      message.textContent = 'দুটি পাসওয়ার্ড একই নয়।';
+      return;
+    }
+
+    if (password.length < 6) {
+      message.textContent = 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।';
+      return;
+    }
+
+    message.textContent = 'রেজিস্ট্রেশন আবেদন জমা হচ্ছে...';
+
+    registrationInProgress = true;
+
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+      .then(function(userCredential) {
+        var user = userCredential.user;
+
+        return firebase.firestore()
+          .collection('memberApplications')
+          .doc(user.uid)
+          .set({
+            name: name,
+            email: email,
+            phone: phone,
+            address: address,
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+      })
+      .then(function() {
+        return firebase.auth().signOut();
+      })
+      .then(function() {
+        registrationInProgress = false;
+
+        document.getElementById('member-register-form').reset();
+        document.getElementById('register-section').hidden = true;
+        document.getElementById('member-login-form').hidden = false;
+
+        document.getElementById('login-message').textContent =
+          'আপনার রেজিস্ট্রেশন আবেদন জমা হয়েছে। অ্যাডমিন অনুমোদনের পর লগইন করতে পারবেন।';
+      })
+      .catch(function(error) {
+        registrationInProgress = false;
+
+        message.textContent =
+          'আবেদন জমা দেওয়া যায়নি: ' + error.code;
+
+        console.error('Registration error:', error);
+      });
+  });
 
     
 var specialNoticesUnsubscribe = null;
@@ -616,6 +757,7 @@ function refreshNoticeCards() {
 
 firebase.auth().onAuthStateChanged(function(user) {
 console.log('Firebase auth state:', user ? user.uid : 'SIGNED OUT');
+  if (registrationInProgress) return;
   
   const loginForm = document.getElementById('member-login-form');
   const profile = document.getElementById('member-profile');
