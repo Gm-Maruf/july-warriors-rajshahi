@@ -541,6 +541,7 @@ function demoLogin(e) {
   const password = document.getElementById('member-pass').value;
   const message = document.getElementById('login-message');
 
+  showingRejectionMessage = false;
   message.textContent = 'লগইন যাচাই হচ্ছে...';
 
   firebase.auth().signInWithEmailAndPassword(email, password)
@@ -557,6 +558,8 @@ function demoLogin(e) {
     });
 }
 
+
+var showingRejectionMessage = false;
 function loadMemberProfile(user) {
   const message = document.getElementById('login-message');
   message.textContent = 'সদস্যের তথ্য লোড হচ্ছে...';
@@ -584,10 +587,16 @@ function loadMemberProfile(user) {
       if (application.status === 'pending') {
         message.textContent =
           'আপনার আবেদন জমা হয়েছে। বর্তমানে অ্যাডমিনের অনুমোদনের অপেক্ষায় রয়েছে।';
+      } 
       } else if (application.status === 'rejected') {
-        message.textContent =
-          'দুঃখিত! আপনার সদস্যপদ আবেদনটি প্রত্যাখ্যান করা হয়েছে। বিস্তারিত জানতে অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
-      } else {
+  showingRejectionMessage = true;
+
+  message.textContent =
+    'দুঃখিত! আপনার সদস্যপদ আবেদনটি প্রত্যাখ্যান করা হয়েছে। বিস্তারিত জানতে অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+
+  firebase.auth().signOut();
+}
+      else {
         message.textContent =
           'আপনার আবেদনের বর্তমান অবস্থা যাচাই করা যাচ্ছে না। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
       }
@@ -793,7 +802,11 @@ console.log('Firebase auth state:', user ? user.uid : 'SIGNED OUT');
 } else {
   profile.hidden = true;
   loginForm.hidden = false;
-  message.textContent = '';
+
+  if (!showingRejectionMessage) {
+    message.textContent = '';
+  }
+
   loadSpecialNoticesForMember(null);
 }
 });
