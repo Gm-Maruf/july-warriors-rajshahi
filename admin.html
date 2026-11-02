@@ -6,63 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Admin Panel | আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</title>
 
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f1f5f9;
-      color: #172033;
-    }
-    header {
-      background: #102d50;
-      color: white;
-      padding: 22px 16px;
-      text-align: center;
-    }
-    header h1 { margin: 0 0 8px; font-size: 23px; }
-    header p { margin: 0; }
-    main { max-width: 1000px; margin: 25px auto; padding: 0 15px; }
-    .panel {
-      background: white;
-      border-radius: 12px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 14px #102d5012;
-    }
-    h2 { margin-top: 0; color: #102d50; }
-    input, textarea, button {
-      width: 100%;
-      padding: 11px;
-      margin: 6px 0;
-      border-radius: 7px;
-      border: 1px solid #cbd5e1;
-      font: inherit;
-    }
-    textarea { min-height: 95px; resize: vertical; }
-    button {
-      background: #123e6a;
-      color: white;
-      border: 0;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:disabled { opacity: .6; cursor: wait; }
-    .secondary { background: #475569; }
-    .danger { background: #b42318; }
-    .hidden { display: none !important; }
-    .status { padding: 10px 0; overflow-wrap: anywhere; }
-    .member, .notice {
-      border: 1px solid #dbe3ed;
-      padding: 13px;
-      margin: 10px 0;
-      border-radius: 8px;
-      overflow-wrap: anywhere;
-    }
-    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .actions button { width: auto; }
-    a { color: #dbeafe; }
-    footer { text-align: center; padding: 20px; color: #64748b; }
+    <style>
+    :root{--navy:#102d50;--blue:#174d7d;--red:#d92735;--ink:#17263d;--muted:#64748b;--line:#e2e8f0;--bg:#f3f6fb;--white:#fff;--shadow:0 12px 32px rgba(16,45,80,.08)}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Arial,"Noto Sans Bengali",sans-serif;line-height:1.55}
+    button,input,textarea,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.6;cursor:wait}
+    .topbar{height:74px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 28px;gap:18px;box-shadow:0 4px 18px #102d5020}
+    .brand h1{font-size:19px;margin:0}.brand p{margin:3px 0 0;color:#cbd8e8;font-size:12px}.top-actions{display:flex;align-items:center;gap:12px}.top-actions a{color:#dbeafe;text-decoration:none;font-size:13px}
+    .layout{display:grid;grid-template-columns:265px minmax(0,1fr);min-height:calc(100vh - 74px)}
+    .sidebar{background:#fff;border-right:1px solid var(--line);padding:22px 14px;position:sticky;top:0;height:calc(100vh - 0px);overflow-y:auto}
+    .side-caption{font-size:11px;color:#94a3b8;font-weight:800;letter-spacing:1px;padding:4px 12px 12px;text-transform:uppercase}
+    .nav-group{margin-bottom:7px}.nav-link,.sub-link{width:100%;border:0;background:transparent;color:#475569;text-align:left;display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;font-weight:700;font-size:14px}
+    .nav-link:hover,.sub-link:hover{background:#f1f5f9;color:var(--navy)}.nav-link.active{background:#eaf1f9;color:var(--navy)}.nav-icon{width:24px;height:24px;display:grid;place-items:center;border-radius:7px;background:#edf2f8;color:var(--blue);font-size:14px}
+    .subnav{padding:3px 0 7px 39px}.sub-link{font-size:12px;font-weight:600;padding:9px 10px}.sub-link.active{color:var(--red);background:#fff1f2}
+    .main-area{padding:28px;min-width:0}.welcome{display:flex;justify-content:space-between;align-items:center;gap:18px;background:linear-gradient(115deg,#12385f,#1d5b8b);color:#fff;border-radius:16px;padding:22px 25px;margin-bottom:22px;box-shadow:var(--shadow)}.welcome h2{margin:0 0 5px;color:#fff;font-size:21px}.welcome p{margin:0;color:#dbeafe;font-size:13px}.welcome button{width:auto;background:#ffffff20;border:1px solid #ffffff45}
+    .view{display:none}.view.active{display:block}.view-head{margin:0 0 18px}.view-head h2{margin:0;color:var(--navy);font-size:23px}.view-head p{margin:5px 0 0;color:var(--muted);font-size:13px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:var(--shadow)}.panel h2,.panel h3{color:var(--navy);margin:0 0 13px}.panel h3{font-size:17px}.panel h4{margin:0 0 12px;color:#334155}
+    input,textarea,select{width:100%;padding:12px 13px;margin:6px 0 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--ink);outline:none}input:focus,textarea:focus,select:focus{border-color:#4b83b5;box-shadow:0 0 0 3px #1d5b8b18}textarea{min-height:105px;resize:vertical}
+    button{background:var(--blue);color:white;border:0;border-radius:8px;padding:11px 16px;font-weight:700}button:hover{filter:brightness(1.06)}.secondary{background:#64748b}.danger{background:#b42318}.hidden{display:none!important}.status{padding:9px 0;color:#526176;font-size:13px;overflow-wrap:anywhere}.member,.notice{border:1px solid var(--line);padding:15px;margin:10px 0;border-radius:10px;background:#fbfdff;overflow-wrap:anywhere}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions button{width:auto}.member p,.notice p{margin:6px 0;color:#526176}.divider{border:0;border-top:1px solid var(--line);margin:20px 0}.subheading{font-size:15px;color:var(--navy);margin:18px 0 10px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.form-grid .full{grid-column:1/-1}.member-tools{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.member-tools button{width:auto}.login-wrap{max-width:480px;margin:9vh auto;padding:0 16px}.login-wrap .panel{padding:28px}.login-wrap h2{font-size:23px}footer{text-align:center;padding:18px;color:#94a3b8;font-size:12px}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto;padding:12px;display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.side-caption{display:none}.nav-group{margin:0;flex:0 0 auto}.nav-link{white-space:nowrap}.subnav{padding:2px 0;display:flex;gap:3px}.sub-link{white-space:nowrap}.main-area{padding:18px}.topbar{padding:0 16px}.welcome{padding:18px}}
+    @media(max-width:560px){.brand h1{font-size:15px}.topbar{height:auto;min-height:68px}.top-actions a{display:none}.main-area{padding:13px}.panel{padding:16px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.welcome{align-items:flex-start;flex-direction:column}.welcome h2{font-size:18px}}
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -77,254 +39,35 @@
   </header>
 
   <main>
-    <section id="login-panel" class="panel">
-      <h2>Admin Login</h2>
-      <p>শুধু অনুমোদিত Admin অ্যাকাউন্ট দিয়ে প্রবেশ করুন।</p>
-      <form id="login-form">
-        <input id="admin-email" type="email" placeholder="Admin Email" required>
-        <input id="admin-password" type="password" placeholder="Password" required>
-        <button id="login-button" type="submit">লগইন</button>
-      </form>
+    <section id="login-panel" class="login-wrap panel">
+      <h2>Admin Login</h2><p>শুধু অনুমোদিত Admin অ্যাকাউন্ট দিয়ে প্রবেশ করুন।</p>
+      <form id="login-form"><input id="admin-email" type="email" placeholder="Admin Email" required><input id="admin-password" type="password" placeholder="Password" required><button id="login-button" type="submit">লগইন</button></form>
       <div id="login-status" class="status" role="status"></div>
     </section>
-
     <section id="admin-panel" class="hidden">
-      <div class="panel">
-        <h2>Admin Dashboard</h2>
-        <p id="admin-welcome"></p>
-        <button id="logout-button" class="secondary">লগআউট</button>
-      </div>
-
-<div class="panel">
-  <h2>নতুন সদস্যের আবেদন</h2>
-  <button id="reload-applications" class="secondary">
-    আবেদন তালিকা রিফ্রেশ
-  </button>
-  <div id="applications-status" class="status">
-    আবেদন লোড করা হয়নি।
-  </div>
-  <div id="applications-list"></div>
-</div>
-
-            <div class="panel">
-        <h2>ওয়েবসাইট কনটেন্ট ব্যবস্থাপনা</h2>
-        <p>মূল ওয়েবসাইটের চারটি বিভাগের লেখা ও তথ্য এখান থেকে পরিচালনা করুন।</p>
-
-        <div id="content-management-status" class="status">
-          কনটেন্ট ব্যবস্থাপনা প্রস্তুত হচ্ছে...
+      <div class="topbar"><div class="brand"><h1>আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</h1><p>Administrator Control Panel</p></div><div class="top-actions"><a href="./index.html">মূল ওয়েবসাইটে ফিরে যান ↗</a><button id="logout-button" class="secondary">লগআউট</button></div></div>
+      <div class="layout">
+        <aside class="sidebar">
+          <div class="side-caption">Admin Dashboard</div>
+          <div class="nav-group"><button class="nav-link active" data-view="members-view"><span class="nav-icon">♙</span>সদস্য ব্যবস্থাপনা</button><div class="subnav"><button class="sub-link active" data-view="existing-member-view">পদ্ধতি ১: আগে থেকে থাকা Firebase Account</button><button class="sub-link" data-view="new-member-view">পদ্ধতি ২: নতুন Firebase Account তৈরি</button><button class="sub-link" data-view="member-list-view">সদস্য তালিকা</button></div></div>
+          <div class="nav-group"><button class="nav-link" data-view="about-view"><span class="nav-icon">▤</span>আমাদের সম্পর্কে</button></div>
+          <div class="nav-group"><button class="nav-link" data-view="activities-view"><span class="nav-icon">✦</span>কার্যক্রম</button></div>
+          <div class="nav-group"><button class="nav-link" data-view="notices-view"><span class="nav-icon">▣</span>নোটিশ ব্যবস্থাপনা</button></div>
+          <div class="nav-group"><button class="nav-link" data-view="contact-view"><span class="nav-icon">✉</span>যোগাযোগ</button></div>
+        </aside>
+        <div class="main-area">
+          <div class="welcome"><div><h2>স্বাগতম, Admin</h2><p id="admin-welcome"></p></div><p>ঐক্য • সাহস • অধিকার</p></div>
+          <section id="members-view" class="view active"><div class="view-head"><h2>সদস্য ব্যবস্থাপনা</h2><p>সদস্যের অ্যাকাউন্ট যুক্ত করুন, তৈরি করুন এবং তালিকা পরিচালনা করুন।</p></div>
+            <div id="existing-member-view" class="view active"><div class="panel"><h3>পদ্ধতি ১: আগে থেকে থাকা Firebase Account</h3><form id="existing-member-form"><input id="existing-member-uid" type="text" placeholder="Firebase Authentication UID" required><div class="form-grid"><input id="existing-member-name" type="text" placeholder="সদস্যের নাম" required><input id="existing-member-email" type="email" placeholder="ইমেইল" required><input id="existing-member-phone" type="text" placeholder="ফোন নম্বর"><textarea id="existing-member-address" class="full" placeholder="ঠিকানা"></textarea></div><label>সদস্যের Role</label><select id="existing-member-role"><option value="member">Member</option><option value="admin">Admin</option></select><button type="submit">Firestore-এ সদস্য যুক্ত করুন</button><div id="existing-member-status" class="status"></div></form></div></div>
+            <div id="new-member-view" class="view"><div class="panel"><h3>পদ্ধতি ২: নতুন Firebase Account তৈরি</h3><form id="new-member-form"><div class="form-grid"><input id="new-member-name" type="text" placeholder="সদস্যের নাম" required><input id="new-member-email" type="email" placeholder="ইমেইল" required><input id="new-member-password" type="password" placeholder="Password (কমপক্ষে ৬ অক্ষর)" minlength="6" required><input id="new-member-phone" type="text" placeholder="ফোন নম্বর"><textarea id="new-member-address" class="full" placeholder="ঠিকানা"></textarea></div><label>সদস্যের Role</label><select id="new-member-role"><option value="member">Member</option><option value="admin">Admin</option></select><button type="submit">নতুন সদস্য তৈরি করুন</button><div id="new-member-status" class="status"></div></form></div></div>
+            <div id="member-list-view" class="view"><div class="panel"><div class="member-tools"><div><h3>সদস্য তালিকা</h3><p>Firestore-এ সংরক্ষিত সদস্যদের তথ্য।</p></div><button id="reload-members">↻ সদস্য তালিকা রিফ্রেশ</button></div><div id="members-status" class="status"></div><div id="members-list"></div></div><div class="panel"><div class="member-tools"><h3>নতুন সদস্যের আবেদন</h3><button id="reload-applications" class="secondary">আবেদন তালিকা রিফ্রেশ</button></div><div id="applications-status" class="status">আবেদন লোড করা হয়নি।</div><div id="applications-list"></div></div></div>
+          </section>
+          <section id="about-view" class="view"><div class="view-head"><h2>আমাদের সম্পর্কে</h2><p>ওয়েবসাইটের পরিচিতি ও অঙ্গীকার সম্পাদনা করুন।</p></div><div class="panel"><form id="about-content-form"><input id="about-title" placeholder="শিরোনাম"><input id="about-subtitle" placeholder="উপশিরোনাম"><textarea id="about-description" placeholder="প্রথম পরিচিতি"></textarea><textarea id="about-description2" placeholder="দ্বিতীয় পরিচিতি"></textarea><textarea id="about-points" placeholder="অঙ্গীকারের তালিকা: প্রতি লাইনে একটি বিষয়"></textarea><button type="submit">আমাদের সম্পর্কে সংরক্ষণ</button></form></div></section>
+          <section id="activities-view" class="view"><div class="view-head"><h2>কার্যক্রম</h2><p>কার্যক্রমের শিরোনাম, বিবরণ ও তালিকা পরিচালনা করুন।</p></div><div class="panel"><form id="activities-content-form"><input id="activities-title" placeholder="শিরোনাম"><input id="activities-subtitle" placeholder="উপশিরোনাম"><hr class="divider"><h3>নতুন কার্যক্রম যোগ করুন</h3><input id="activity-item-title" placeholder="কার্যক্রমের শিরোনাম"><textarea id="activity-item-description" placeholder="কার্যক্রমের বিস্তারিত বিবরণ"></textarea><div class="actions"><button id="activity-item-submit" type="button">কার্যক্রম যোগ করুন</button><button id="activity-item-cancel" type="button" class="secondary hidden">সম্পাদনা বাতিল</button></div><h3 class="subheading">বর্তমান কার্যক্রমের তালিকা</h3><div id="activities-items-list">কার্যক্রম লোড হচ্ছে...</div><hr class="divider"><button type="submit">সব কার্যক্রম সংরক্ষণ করুন</button></form></div></section>
+          <section id="notices-view" class="view"><div class="view-head"><h2>নোটিশ ব্যবস্থাপনা</h2><p>পাবলিক নোটিশ ও সদস্যদের জন্য বিশেষ নোটিশ পরিচালনা করুন।</p></div><div class="panel"><h3>নোটিশ</h3><form id="public-notices-content-form"><input id="public-notices-title" placeholder="নোটিশ বিভাগের শিরোনাম"><input id="public-notices-subtitle" placeholder="উপশিরোনাম"><textarea id="public-notices-items" placeholder="প্রতি লাইনে: শিরোনাম | বিবরণ | তারিখ | ক্যাটাগরি"></textarea><button type="submit">পাবলিক নোটিশ সংরক্ষণ</button></form></div><div class="panel"><h3>বিশেষ নোটিশ প্রকাশ</h3><form id="notice-form"><input id="notice-title" maxlength="150" placeholder="নোটিশের শিরোনাম" required><textarea id="notice-body" maxlength="9000" placeholder="নোটিশের বিস্তারিত" required></textarea><div class="actions"><button id="notice-submit" type="submit">নোটিশ প্রকাশ করুন</button><button id="notice-cancel" type="button" class="secondary hidden">সম্পাদনা বাতিল</button></div></form><div id="notice-status" class="status" role="status"></div></div><div class="panel"><div class="member-tools"><h3>বিশেষ নোটিশ ব্যবস্থাপনা</h3><button id="reload-notices" class="secondary">নোটিশ তালিকা রিফ্রেশ</button></div><div id="special-notices-list"></div></div></section>
+          <section id="contact-view" class="view"><div class="view-head"><h2>যোগাযোগ</h2><p>ওয়েবসাইটের যোগাযোগের তথ্য হালনাগাদ করুন।</p></div><div class="panel"><form id="contact-content-form"><input id="contact-title" placeholder="যোগাযোগের শিরোনাম"><textarea id="contact-description" placeholder="যোগাযোগের বিবরণ"></textarea><div class="form-grid"><input id="contact-phone" placeholder="ফোন নম্বর"><input id="contact-email" type="email" placeholder="ইমেইল"><input id="contact-address" class="full" placeholder="ঠিকানা"></div><button type="submit">যোগাযোগের তথ্য সংরক্ষণ</button></form></div></section>
+          <div id="content-management-status" class="status"></div>
         </div>
-
-                <div id="content-management-list">
-
-          <h3>১. আমাদের সম্পর্কে</h3>
-          <form id="about-content-form">
-            <input id="about-title" placeholder="শিরোনাম">
-            <input id="about-subtitle" placeholder="উপশিরোনাম">
-            <textarea id="about-description" placeholder="প্রথম পরিচিতি"></textarea>
-            <textarea id="about-description2" placeholder="দ্বিতীয় পরিচিতি"></textarea>
-            <textarea id="about-points" placeholder="অঙ্গীকারের তালিকা: প্রতি লাইনে একটি বিষয়"></textarea>
-            <button type="submit">আমাদের সম্পর্কে সংরক্ষণ</button>
-          </form>
-
-          <hr>
-
-          <h3>২. কার্যক্রম</h3>
-
-<form id="activities-content-form">
-  <input id="activities-title" placeholder="শিরোনাম">
-  <input id="activities-subtitle" placeholder="উপশিরোনাম">
-
-  <hr>
-
-  <h4>নতুন কার্যক্রম যোগ করুন</h4>
-
-  <input
-    id="activity-item-title"
-    placeholder="কার্যক্রমের শিরোনাম"
-  >
-
-  <textarea
-    id="activity-item-description"
-    placeholder="কার্যক্রমের বিস্তারিত বিবরণ"
-  ></textarea>
-
-  <div class="actions">
-    <button id="activity-item-submit" type="button">
-      কার্যক্রম যোগ করুন
-    </button>
-
-    <button
-      id="activity-item-cancel"
-      type="button"
-      class="secondary hidden"
-    >
-      সম্পাদনা বাতিল
-    </button>
-  </div>
-
-  <h4>বর্তমান কার্যক্রমের তালিকা</h4>
-
-  <div id="activities-items-list">
-    কার্যক্রম লোড হচ্ছে...
-  </div>
-
-  <hr>
-
-  <button type="submit">সব কার্যক্রম সংরক্ষণ করুন</button>
-</form>
-
-          <hr>
-
-          <h3>৩. নোটিশ</h3>
-          <form id="public-notices-content-form">
-            <input id="public-notices-title" placeholder="নোটিশ বিভাগের শিরোনাম">
-            <input id="public-notices-subtitle" placeholder="উপশিরোনাম">
-            <textarea id="public-notices-items" placeholder="প্রতি লাইনে: শিরোনাম | বিবরণ | তারিখ | ক্যাটাগরি"></textarea>
-            <button type="submit">পাবলিক নোটিশ সংরক্ষণ</button>
-          </form>
-
-          <hr>
-
-          <h3>৪. যোগাযোগ</h3>
-          <form id="contact-content-form">
-            <input id="contact-title" placeholder="যোগাযোগের শিরোনাম">
-            <textarea id="contact-description" placeholder="যোগাযোগের বিবরণ"></textarea>
-            <input id="contact-phone" placeholder="ফোন নম্বর">
-            <input id="contact-email" type="email" placeholder="ইমেইল">
-            <input id="contact-address" placeholder="ঠিকানা">
-            <button type="submit">যোগাযোগের তথ্য সংরক্ষণ</button>
-          </form>
-
-        </div>
-      </div>
-      
-      <div class="panel">
-        <h2>সদস্য ব্যবস্থাপনা</h2>
-        <p>নিচে Firestore-এ সংরক্ষিত সদস্যদের তথ্য দেখা যাবে।</p>
-
-        <hr>
-
-<h3>নতুন সদস্য যোগ করুন</h3>
-
-<div class="member">
-
-  <h4>পদ্ধতি ১: আগে থেকে থাকা Firebase Account</h4>
-
-  <form id="existing-member-form">
-
-    <input id="existing-member-uid"
-      type="text"
-      placeholder="Firebase Authentication UID"
-      required>
-
-    <input id="existing-member-name"
-      type="text"
-      placeholder="সদস্যের নাম"
-      required>
-
-    <input id="existing-member-email"
-      type="email"
-      placeholder="ইমেইল"
-      required>
-
-    <input id="existing-member-phone"
-      type="text"
-      placeholder="ফোন নম্বর">
-
-    <textarea id="existing-member-address"
-      placeholder="ঠিকানা"></textarea>
-
-    <select id="existing-member-role">
-      <option value="member">Member</option>
-      <option value="admin">Admin</option>
-    </select>
-
-    <button type="submit">Firestore-এ সদস্য যুক্ত করুন</button>
-
-    <div id="existing-member-status" class="status"></div>
-
-  </form>
-
-</div>
-
-<div class="member">
-
-  <h4>পদ্ধতি ২: নতুন Firebase Account তৈরি</h4>
-
-<h4>নতুন সদস্য তৈরি করুন</h4>
-
-<form id="new-member-form">
-
-  <input id="new-member-name"
-    type="text"
-    placeholder="সদস্যের নাম"
-    required>
-
-  <input id="new-member-email"
-    type="email"
-    placeholder="ইমেইল"
-    required>
-
-  <input id="new-member-password"
-    type="password"
-    placeholder="Password (কমপক্ষে ৬ অক্ষর)"
-    minlength="6"
-    required>
-
-  <button type="submit">নতুন সদস্য তৈরি করুন</button>
-
-  <div id="new-member-status" class="status"></div>
-
-</form>
-
-</div>
-
-<hr>
-        
-        <button id="reload-members">সদস্য তালিকা রিফ্রেশ</button>
-        <div id="members-status" class="status"></div>
-        <div id="members-list"></div>
-      </div>
-
-      <div class="panel">
-  <h2>বিশেষ নোটিশ প্রকাশ</h2>
-  <form id="notice-form">
-    <input
-      id="notice-title"
-      maxlength="150"
-      placeholder="নোটিশের শিরোনাম"
-      required
-    >
-
-    <textarea
-      id="notice-body"
-      maxlength="9000"
-      placeholder="নোটিশের বিস্তারিত"
-      required
-    ></textarea>
-
-    <div class="actions">
-      <button id="notice-submit" type="submit">
-        নোটিশ প্রকাশ করুন
-      </button>
-
-      <button
-        id="notice-cancel"
-        type="button"
-        class="secondary hidden"
-      >
-        সম্পাদনা বাতিল
-      </button>
-    </div>
-  </form>
-
-  <div id="notice-status" class="status" role="status"></div>
-</div>
-
-      <div class="panel">
-        <h2>বিশেষ নোটিশ ব্যবস্থাপনা</h2>
-        <button id="reload-notices" class="secondary">নোটিশ তালিকা রিফ্রেশ</button>
-        <div id="special-notices-list"></div>
       </div>
     </section>
   </main>
@@ -1267,10 +1010,10 @@ document.getElementById("new-member-form")
       await db.collection("members").doc(newUid).set({
   name: name,
   email: email,
-  phone: "",
-  address: "",
+  phone: phone,
+  address: address,
   photoURL: "",
-  role: "member",
+  role: role,
   createdAt: firebase.firestore.FieldValue.serverTimestamp()
 });
 
@@ -1307,6 +1050,39 @@ document.getElementById("new-member-form")
 
 
     
+
+// Sidebar navigation: show one workspace at a time.
+(function setupDashboardNavigation() {
+  var navButtons = document.querySelectorAll("[data-view]");
+  var views = document.querySelectorAll(".main-area .view");
+  function openView(viewId) {
+    views.forEach(function(view) {
+      view.classList.toggle("active", view.id === viewId);
+    });
+    navButtons.forEach(function(button) {
+      var isActive = button.getAttribute("data-view") === viewId;
+      button.classList.toggle("active", isActive);
+      if (isActive && button.classList.contains("sub-link")) {
+        var parent = button.closest(".nav-group");
+        if (parent) parent.querySelector(".nav-link").classList.add("active");
+      }
+      if (isActive && button.classList.contains("nav-link")) {
+        var group = button.closest(".nav-group");
+        if (group) group.querySelectorAll(".sub-link").forEach(function(sub) { sub.classList.remove("active"); });
+      }
+    });
+    if (viewId === "member-list-view") { loadMembers(); loadApplications(); }
+  }
+  navButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
+      var target = button.getAttribute("data-view");
+      if (target === "members-view") target = "existing-member-view";
+      openView(target);
+    });
+  });
+  openView("existing-member-view");
+})();
+
   </script>
 </body>
 </html>
