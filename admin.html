@@ -1165,6 +1165,147 @@ document.getElementById("contact-content-form")
     }, "contact-content-form");
   });
 
+
+    
+// ======================================
+// ADD EXISTING FIREBASE USER TO MEMBERS
+// ======================================
+
+document.getElementById("existing-member-form")
+  .addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!currentAdmin) {
+      alert("প্রথমে Admin হিসেবে লগইন করুন।");
+      return;
+    }
+
+    var status = document.getElementById("existing-member-status");
+    var button = this.querySelector("button[type='submit']");
+
+    var uid = document.getElementById("existing-member-uid").value.trim();
+    var name = document.getElementById("existing-member-name").value.trim();
+    var email = document.getElementById("existing-member-email").value.trim();
+    var phone = document.getElementById("existing-member-phone").value.trim();
+    var address = document.getElementById("existing-member-address").value.trim();
+    var role = document.getElementById("existing-member-role").value;
+
+    button.disabled = true;
+    status.textContent = "সদস্য যুক্ত হচ্ছে...";
+
+    try {
+      var memberRef = db.collection("members").doc(uid);
+      var existing = await memberRef.get();
+
+      if (existing.exists) {
+        throw new Error("এই UID দিয়ে সদস্য রেকর্ড আগে থেকেই আছে।");
+      }
+
+      await memberRef.set({
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        photoURL: "",
+        role: role,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      status.textContent = "সদস্য সফলভাবে যুক্ত হয়েছে।";
+      this.reset();
+
+      await loadMembers();
+
+    } catch (error) {
+      status.textContent = "সদস্য যুক্ত করা যায়নি: " + error.message;
+      console.error(error);
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+
+// ======================================
+// CREATE NEW FIREBASE MEMBER ACCOUNT
+// ======================================
+
+document.getElementById("new-member-form")
+  .addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    if (!currentAdmin) {
+      alert("প্রথমে Admin হিসেবে লগইন করুন।");
+      return;
+    }
+
+    var status = document.getElementById("new-member-status");
+    var button = this.querySelector("button[type='submit']");
+
+    var name = document.getElementById("new-member-name").value.trim();
+    var email = document.getElementById("new-member-email").value.trim();
+    var password = document.getElementById("new-member-password").value;
+    var phone = document.getElementById("new-member-phone").value.trim();
+    var address = document.getElementById("new-member-address").value.trim();
+    var role = document.getElementById("new-member-role").value;
+
+    button.disabled = true;
+    status.textContent = "নতুন Firebase Account তৈরি হচ্ছে...";
+
+    var newUid = null;
+
+    try {
+      var credential =
+        await memberCreatorAuth.createUserWithEmailAndPassword(
+          email,
+          password
+        );
+
+      newUid = credential.user.uid;
+
+      status.textContent = "Account তৈরি হয়েছে। সদস্যের তথ্য সংরক্ষণ হচ্ছে...";
+
+      await db.collection("members").doc(newUid).set({
+        name: name,
+        email: email,
+        phone: phone,
+        address: address,
+        photoURL: "",
+        role: role,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      await memberCreatorAuth.signOut();
+
+      status.textContent = "নতুন সদস্য সফলভাবে তৈরি হয়েছে। UID: " + newUid;
+
+      this.reset();
+      await loadMembers();
+
+      alert("নতুন সদস্যের Account ও Firestore Record তৈরি হয়েছে।");
+
+    } catch (error) {
+      if (memberCreatorAuth.currentUser) {
+        await memberCreatorAuth.signOut().catch(function(signOutError) {
+          console.error(signOutError);
+        });
+      }
+
+      if (newUid) {
+        status.textContent =
+          "Firebase Account তৈরি হয়েছে, কিন্তু Firestore Record তৈরি হয়নি। UID: " +
+          newUid + "। Error: " + error.message;
+      } else {
+        status.textContent = "Account তৈরি করা যায়নি: " + error.message;
+      }
+
+      console.error(error);
+
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+
     
   </script>
 </body>
