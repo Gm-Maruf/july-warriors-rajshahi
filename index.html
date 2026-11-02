@@ -560,6 +560,7 @@ function demoLogin(e) {
 
 
 var showingRejectionMessage = false;
+
 function loadMemberProfile(user) {
   const message = document.getElementById('login-message');
   message.textContent = 'সদস্যের তথ্য লোড হচ্ছে...';
@@ -569,39 +570,60 @@ function loadMemberProfile(user) {
     .doc(user.uid)
     .get()
     .then(function(doc) {
+
       if (!doc.exists) {
-  return firebase.firestore()
-    .collection('memberApplications')
-    .doc(user.uid)
-    .get()
-    .then(function(applicationDoc) {
+        return firebase.firestore()
+          .collection('memberApplications')
+          .doc(user.uid)
+          .get()
+          .then(function(applicationDoc) {
 
-      if (!applicationDoc.exists) {
-        message.textContent =
-          'আপনার কোনো সদস্য আবেদন পাওয়া যায়নি। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
-        return;
+            if (!applicationDoc.exists) {
+              message.textContent =
+                'আপনার কোনো সদস্য আবেদন পাওয়া যায়নি। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+              return;
+            }
+
+            var application = applicationDoc.data();
+
+            if (application.status === 'pending') {
+              message.textContent =
+                'আপনার আবেদন জমা হয়েছে। বর্তমানে অ্যাডমিনের অনুমোদনের অপেক্ষায় রয়েছে।';
+
+            } else if (application.status === 'rejected') {
+              showingRejectionMessage = true;
+
+              message.textContent =
+                'দুঃখিত! আপনার সদস্যপদ আবেদনটি প্রত্যাখ্যান করা হয়েছে। বিস্তারিত জানতে অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+
+              return firebase.auth().signOut();
+
+            } else {
+              message.textContent =
+                'আপনার আবেদনের বর্তমান অবস্থা যাচাই করা যাচ্ছে না। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+            }
+          });
       }
 
-      var application = applicationDoc.data();
+      const data = doc.data();
 
-      if (application.status === 'pending') {
-        message.textContent =
-          'আপনার আবেদন জমা হয়েছে। বর্তমানে অ্যাডমিনের অনুমোদনের অপেক্ষায় রয়েছে।';
-      } 
-      } else if (application.status === 'rejected') {
-  showingRejectionMessage = true;
+      document.getElementById('member-profile').hidden = false;
+      document.getElementById('member-login-form').hidden = true;
 
-  message.textContent =
-    'দুঃখিত! আপনার সদস্যপদ আবেদনটি প্রত্যাখ্যান করা হয়েছে। বিস্তারিত জানতে অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
+      document.getElementById('profile-name').value = data.name || '';
+      document.getElementById('profile-email').value = data.email || user.email || '';
+      document.getElementById('profile-phone').value = data.phone || '';
+      document.getElementById('profile-address').value = data.address || '';
+      document.getElementById('profile-photo').value = data.photoURL || '';
 
-  firebase.auth().signOut();
-}
-      else {
-        message.textContent =
-          'আপনার আবেদনের বর্তমান অবস্থা যাচাই করা যাচ্ছে না। অ্যাডমিনের সঙ্গে যোগাযোগ করুন।';
-      }
+      message.textContent = 'আপনার সদস্য-তথ্য লোড হয়েছে।';
+    })
+    .catch(function(error) {
+      message.textContent =
+        'সদস্যের তথ্য লোড করা যায়নি: ' + error.code;
     });
 }
+
 
       const data = doc.data();
 
