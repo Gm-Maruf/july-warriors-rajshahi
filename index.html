@@ -625,24 +625,7 @@ function loadMemberProfile(user) {
 }
 
 
-      const data = doc.data();
 
-      document.getElementById('member-profile').hidden = false;
-      document.getElementById('member-login-form').hidden = true;
-
-      document.getElementById('profile-name').value = data.name || '';
-      document.getElementById('profile-email').value = data.email || user.email || '';
-      document.getElementById('profile-phone').value = data.phone || '';
-      document.getElementById('profile-address').value = data.address || '';
-      document.getElementById('profile-photo').value = data.photoURL || '';
-
-      message.textContent = 'আপনার সদস্য-তথ্য লোড হয়েছে।';
-    })
-    .catch(function(error) {
-      message.textContent =
-        'সদস্যের তথ্য লোড করা যায়নি: ' + error.code;
-    });
-}
 
     document.getElementById('member-register-form')
   .addEventListener('submit', function(e) {
