@@ -277,6 +277,20 @@ var firebaseConfig = {
     var db = firebase.firestore();
     var currentAdmin = null;
 
+    // Separate Firebase Authentication for creating new members
+var memberCreatorApp = firebase.apps.find(function(app) {
+  return app.name === "memberCreator";
+});
+
+if (!memberCreatorApp) {
+  memberCreatorApp = firebase.initializeApp(
+    firebaseConfig,
+    "memberCreator"
+  );
+}
+
+var memberCreatorAuth = memberCreatorApp.auth();
+
     var loginPanel = document.getElementById("login-panel");
     var adminPanel = document.getElementById("admin-panel");
     var loginStatus = document.getElementById("login-status");
