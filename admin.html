@@ -251,41 +251,31 @@
 
   <h4>পদ্ধতি ২: নতুন Firebase Account তৈরি</h4>
 
-  <form id="new-member-form">
+<h4>নতুন সদস্য তৈরি করুন</h4>
 
-    <input id="new-member-name"
-      type="text"
-      placeholder="সদস্যের নাম"
-      required>
+<form id="new-member-form">
 
-    <input id="new-member-email"
-      type="email"
-      placeholder="ইমেইল"
-      required>
+  <input id="new-member-name"
+    type="text"
+    placeholder="সদস্যের নাম"
+    required>
 
-    <input id="new-member-password"
-      type="password"
-      placeholder="প্রাথমিক Password (কমপক্ষে ৬ অক্ষর)"
-      minlength="6"
-      required>
+  <input id="new-member-email"
+    type="email"
+    placeholder="ইমেইল"
+    required>
 
-    <input id="new-member-phone"
-      type="text"
-      placeholder="ফোন নম্বর">
+  <input id="new-member-password"
+    type="password"
+    placeholder="Password (কমপক্ষে ৬ অক্ষর)"
+    minlength="6"
+    required>
 
-    <textarea id="new-member-address"
-      placeholder="ঠিকানা"></textarea>
+  <button type="submit">নতুন সদস্য তৈরি করুন</button>
 
-    <select id="new-member-role">
-      <option value="member">Member</option>
-      <option value="admin">Admin</option>
-    </select>
+  <div id="new-member-status" class="status"></div>
 
-    <button type="submit">নতুন Account তৈরি করুন</button>
-
-    <div id="new-member-status" class="status"></div>
-
-  </form>
+</form>
 
 </div>
 
@@ -1265,14 +1255,14 @@ document.getElementById("new-member-form")
       status.textContent = "Account তৈরি হয়েছে। সদস্যের তথ্য সংরক্ষণ হচ্ছে...";
 
       await db.collection("members").doc(newUid).set({
-        name: name,
-        email: email,
-        phone: phone,
-        address: address,
-        photoURL: "",
-        role: role,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+  name: name,
+  email: email,
+  phone: "",
+  address: "",
+  photoURL: "",
+  role: "member",
+  createdAt: firebase.firestore.FieldValue.serverTimestamp()
+});
 
       await memberCreatorAuth.signOut();
 
