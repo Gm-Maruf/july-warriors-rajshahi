@@ -580,7 +580,8 @@ function loadSpecialNoticesForMember(user) {
             heading.textContent = data.title || 'শিরোনাম নেই';
 
             var content = document.createElement('p');
-            content.textContent = data.body || '';
+content.textContent = data.body || '';
+content.style.whiteSpace = 'pre-wrap';
 
             card.appendChild(label);
             card.appendChild(heading);
