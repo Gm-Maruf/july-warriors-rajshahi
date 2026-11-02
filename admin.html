@@ -7,375 +7,13 @@
   <title>Admin Panel | আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</title>
 
   <style>
-    
-* {
-  box-sizing: border-box;
-}
-
-:root {
-  --navy: #10243e;
-  --navy-light: #183858;
-  --blue: #2563eb;
-  --blue-light: #eff6ff;
-  --bg: #f4f7fb;
-  --white: #ffffff;
-  --text: #172b45;
-  --muted: #64748b;
-  --border: #e2e8f0;
-  --green: #15803d;
-  --red: #dc2626;
-  --shadow: 0 8px 28px rgba(15, 35, 65, .07);
-}
-
-body {
-  margin: 0;
-  font-family: Arial, "Noto Sans Bengali", sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-}
-
-/* HEADER */
-
-header {
-  background: linear-gradient(120deg, #10243e, #1d4772);
-  color: white;
-  padding: 30px 20px;
-  text-align: left;
-  box-shadow: 0 5px 20px rgba(16, 36, 62, .15);
-}
-
-header h1 {
-  max-width: 1100px;
-  margin: auto;
-  font-size: 25px;
-  font-weight: 700;
-}
-
-header p {
-  max-width: 1100px;
-  margin: 5px auto 0;
-  color: #cbdcf0;
-  font-size: 14px;
-}
-
-header a {
-  color: #bfdbfe;
-  text-decoration: none;
-}
-
-header a:hover {
-  color: white;
-}
-
-/* MAIN LAYOUT */
-
-main {
-  max-width: 1180px;
-  margin: 30px auto;
-  padding: 0 20px;
-}
-
-#admin-panel {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 22px;
-}
-
-.hidden {
-  display: none !important;
-}
-
-/* PANELS */
-
-.panel {
-  background: var(--white);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 25px;
-  margin-bottom: 0;
-  box-shadow: var(--shadow);
-}
-
-.panel h2 {
-  margin: 0 0 12px;
-  color: var(--navy);
-  font-size: 21px;
-  font-weight: 750;
-  padding-bottom: 13px;
-  border-bottom: 1px solid var(--border);
-}
-
-.panel h3 {
-  color: #24496f;
-  font-size: 18px;
-  margin-top: 25px;
-}
-
-.panel h4 {
-  color: var(--text);
-  font-size: 15px;
-}
-
-/* LOGIN */
-
-#login-panel {
-  max-width: 470px;
-  margin: 70px auto;
-  padding: 35px;
-  border-top: 5px solid var(--blue);
-}
-
-#login-panel h2 {
-  font-size: 25px;
-}
-
-#login-panel p {
-  color: var(--muted);
-}
-
-/* FORM ELEMENTS */
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 13px 14px;
-  margin: 7px 0 13px;
-  border: 1px solid #d5deea;
-  border-radius: 9px;
-  background: #fbfdff;
-  color: var(--text);
-  font: inherit;
-  font-size: 14px;
-  outline: none;
-  transition: .2s;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--blue);
-  background: white;
-  box-shadow: 0 0 0 3px #2563eb18;
-}
-
-textarea {
-  min-height: 110px;
-  resize: vertical;
-}
-
-/* BUTTONS */
-
-button {
-  width: 100%;
-  padding: 12px 17px;
-  margin: 6px 0;
-  border: 0;
-  border-radius: 9px;
-  background: var(--blue);
-  color: white;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: .2s;
-}
-
-button:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px #2563eb25;
-}
-
-button:disabled {
-  opacity: .55;
-  cursor: wait;
-  transform: none;
-}
-
-.secondary {
-  background: #475569;
-}
-
-.secondary:hover {
-  background: #334155;
-}
-
-.danger {
-  background: var(--red);
-}
-
-.danger:hover {
-  background: #b91c1c;
-}
-
-/* ACTION BUTTONS */
-
-.actions {
-  display: flex;
-  gap: 9px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.actions button {
-  width: auto;
-  min-width: 115px;
-  flex: 0 1 auto;
-}
-
-/* MEMBER AND NOTICE CARDS */
-
-.member,
-.notice {
-  background: #fbfdff;
-  border: 1px solid var(--border);
-  border-left: 4px solid var(--blue);
-  padding: 18px;
-  margin: 13px 0;
-  border-radius: 11px;
-  overflow-wrap: anywhere;
-  transition: .2s;
-}
-
-.member:hover,
-.notice:hover {
-  box-shadow: 0 5px 18px rgba(15, 35, 65, .06);
-  border-color: #bfdbfe;
-}
-
-.member strong,
-.notice strong {
-  display: block;
-  color: var(--navy);
-  font-size: 16px;
-  margin-bottom: 9px;
-}
-
-.member p,
-.notice p {
-  margin: 5px 0;
-  color: #52657d;
-  font-size: 14px;
-  white-space: pre-wrap;
-}
-
-/* STATUS */
-
-.status {
-  padding: 12px 14px;
-  margin: 10px 0;
-  background: var(--blue-light);
-  border-radius: 8px;
-  color: #1e40af;
-  font-size: 13px;
-  overflow-wrap: anywhere;
-}
-
-/* DIVIDERS */
-
-hr {
-  border: 0;
-  border-top: 1px solid var(--border);
-  margin: 25px 0;
-}
-
-/* CONTENT MANAGEMENT */
-
-#content-management-list {
-  padding-top: 10px;
-}
-
-#content-management-list h3 {
-  padding: 12px 14px;
-  background: #f1f6fd;
-  border-left: 4px solid var(--blue);
-  border-radius: 7px;
-}
-
-#content-management-list form {
-  padding: 8px 0 15px;
-}
-
-/* APPLICATIONS AND MEMBERS */
-
-#applications-list,
-#members-list,
-#special-notices-list,
-#activities-items-list {
-  margin-top: 15px;
-}
-
-/* FOOTER */
-
-footer {
-  text-align: center;
-  padding: 25px 15px;
-  margin-top: 40px;
-  background: var(--navy);
-  color: #cbd5e1;
-  font-size: 13px;
-}
-
-/* RESPONSIVE DESIGN */
-
-@media (min-width: 900px) {
-  #admin-panel > .panel:first-child {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-  }
-
-  #admin-panel > .panel:first-child h2 {
-    border: 0;
-    margin: 0;
-  }
-
-  #admin-panel > .panel:first-child button {
-    width: auto;
-    min-width: 130px;
-  }
-}
-
-@media (max-width: 600px) {
-  header {
-    padding: 23px 17px;
-  }
-
-  header h1 {
-    font-size: 19px;
-  }
-
-  main {
-    margin: 18px auto;
-    padding: 0 12px;
-  }
-
-  .panel {
-    padding: 17px;
-    border-radius: 12px;
-  }
-
-  .panel h2 {
-    font-size: 18px;
-  }
-
-  #login-panel {
-    margin: 35px auto;
-    padding: 23px;
-  }
-
-  .actions {
-    flex-direction: column;
-  }
-
-  .actions button {
-    width: 100%;
-  }
-}
-
+    :root{--navy:#102d50;--blue:#174a78;--red:#d92735;--bg:#f3f6fb;--ink:#172033;--muted:#64748b;--line:#e2e8f0;--white:#fff}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:22px}body{margin:0;font-family:Arial,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--ink)}
+    .topbar{background:var(--navy);color:#fff;padding:17px 26px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 3px 14px #102d5020}.topbar h1{font-size:20px;margin:0 0 3px}.topbar p{margin:0;color:#d7e4f3;font-size:13px}.topbar a{color:#fff;text-decoration:none;border:1px solid #ffffff55;padding:9px 13px;border-radius:9px;font-size:13px}
+    main{max-width:1440px;margin:26px auto;padding:0 22px}.panel{background:var(--white);border:1px solid var(--line);border-radius:15px;padding:22px;margin-bottom:20px;box-shadow:0 5px 20px #102d5009}.panel h2{margin:0 0 13px;color:var(--navy);font-size:20px}.panel p{color:var(--muted)}
+    input,textarea,select,button{width:100%;padding:11px 13px;margin:6px 0;border-radius:9px;border:1px solid #cbd5e1;font:inherit}input:focus,textarea:focus,select:focus{outline:3px solid #bfdbfe;border-color:#3976ad}textarea{min-height:95px;resize:vertical}button{background:var(--blue);color:white;border:0;cursor:pointer;font-weight:700;transition:.18s}button:hover{filter:brightness(1.08);transform:translateY(-1px)}button:disabled{opacity:.6;cursor:wait;transform:none}.secondary{background:#64748b}.danger{background:#b42318}.hidden{display:none!important}.status{padding:10px 0;overflow-wrap:anywhere;color:var(--muted)}.member,.notice{border:1px solid var(--line);padding:15px;margin:11px 0;border-radius:11px;overflow-wrap:anywhere;background:#fbfdff}.member p,.notice p{margin:7px 0}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{width:auto;min-width:115px}.dashboard-shell{display:grid;grid-template-columns:235px minmax(0,1fr);gap:22px;align-items:start}.sidebar{background:var(--navy);color:#fff;border-radius:16px;padding:18px;position:sticky;top:18px}.side-title{font-size:12px;color:#b8cbe0;text-transform:uppercase;letter-spacing:1px;margin:2px 10px 13px}.side-nav{display:grid;gap:7px}.side-nav a{display:block;text-decoration:none;color:#e7eff8;padding:11px 12px;border-radius:9px;font-size:14px}.side-nav a:hover{background:#ffffff18;color:#fff}.side-nav a:before{content:'›';font-size:18px;margin-right:9px;color:#f4a0a6}.side-foot{border-top:1px solid #ffffff30;margin-top:18px;padding-top:13px}.side-foot a{display:block;color:#fff;text-decoration:none;padding:10px 12px;font-size:14px}.dashboard-content{min-width:0}.welcome-panel{background:linear-gradient(115deg,#102d50,#1d5685);color:white;display:flex;justify-content:space-between;align-items:center;gap:20px}.welcome-panel h2{color:white;font-size:24px}.welcome-panel p{color:#dce8f5;margin:4px 0}.welcome-panel button{width:auto;background:var(--red);padding:10px 18px}.section-kicker{font-size:12px;font-weight:700;color:var(--red);letter-spacing:.5px;margin-bottom:5px}.panel[id]{scroll-margin-top:20px}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.panel-head button{width:auto}.empty-hint{background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:14px;color:var(--muted)}footer{text-align:center;padding:20px;color:#64748b}
+    @media(max-width:850px){main{padding:0 13px}.dashboard-shell{grid-template-columns:1fr}.sidebar{position:static;padding:12px}.side-title{margin:4px 8px}.side-nav{display:flex;overflow-x:auto;gap:5px}.side-nav a{white-space:nowrap;padding:9px}.side-foot{display:flex;justify-content:flex-end;margin-top:8px;padding-top:5px}.welcome-panel{align-items:flex-start;flex-direction:column}.welcome-panel button{width:100%}}
+    @media(max-width:520px){.topbar{padding:14px;align-items:flex-start;flex-direction:column}.topbar h1{font-size:17px}main{margin:15px auto}.panel{padding:16px}.panel h2{font-size:18px}.actions button{flex:1}.side-nav a{font-size:12px}}
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -383,10 +21,9 @@ footer {
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <header>
-    <h1>আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</h1>
-    <p>Administrator Control Panel</p>
-    <p><a href="./index.html">মূল ওয়েবসাইটে ফিরে যান</a></p>
+  <header class="topbar">
+    <div><h1>আমরা জুলাই যোদ্ধা — রাজশাহী ইউনিট</h1><p>Administrator Control Panel · ঐক্য • সাহস • অধিকার</p></div>
+    <a href="./index.html">← মূল ওয়েবসাইটে ফিরে যান</a>
   </header>
 
   <main>
@@ -402,204 +39,43 @@ footer {
     </section>
 
     <section id="admin-panel" class="hidden">
-      <div class="panel">
-        <h2>Admin Dashboard</h2>
-        <p id="admin-welcome"></p>
+      <div class="dashboard-shell">
+        <aside class="sidebar">
+          <div class="side-title">Dashboard Menu</div>
+          <nav class="side-nav">
+            <a href="#dashboard-home">ড্যাশবোর্ড</a>
+            <a href="#applications-section">সদস্য আবেদন</a>
+            <a href="#members-section">সদস্য ব্যবস্থাপনা</a>
+            <a href="#notice-create-section">নোটিশ প্রকাশ</a>
+            <a href="#notice-list-section">নোটিশ তালিকা</a>
+          </nav>
+          <div class="side-foot"><a href="#" id="sidebar-logout">↪ লগআউট</a></div>
+        </aside>
+        <div class="dashboard-content">
+      <div class="panel welcome-panel" id="dashboard-home">
+        <div><div class="section-kicker">ADMINISTRATOR</div><h2>ড্যাশবোর্ড</h2>
+        <p id="admin-welcome"></p></div>
         <button id="logout-button" class="secondary">লগআউট</button>
       </div>
 
-<div class="panel">
-  <h2>নতুন সদস্যের আবেদন</h2>
-  <button id="reload-applications" class="secondary">
-    আবেদন তালিকা রিফ্রেশ
-  </button>
+<div class="panel" id="applications-section">
+  <div class="panel-head"><h2>নতুন সদস্যের আবেদন</h2>
+  <button id="reload-applications" class="secondary">↻ আবেদন তালিকা রিফ্রেশ</button></div>
   <div id="applications-status" class="status">
     আবেদন লোড করা হয়নি।
   </div>
   <div id="applications-list"></div>
 </div>
-
-            <div class="panel">
-        <h2>ওয়েবসাইট কনটেন্ট ব্যবস্থাপনা</h2>
-        <p>মূল ওয়েবসাইটের চারটি বিভাগের লেখা ও তথ্য এখান থেকে পরিচালনা করুন।</p>
-
-        <div id="content-management-status" class="status">
-          কনটেন্ট ব্যবস্থাপনা প্রস্তুত হচ্ছে...
-        </div>
-
-                <div id="content-management-list">
-
-          <h3>১. আমাদের সম্পর্কে</h3>
-          <form id="about-content-form">
-            <input id="about-title" placeholder="শিরোনাম">
-            <input id="about-subtitle" placeholder="উপশিরোনাম">
-            <textarea id="about-description" placeholder="প্রথম পরিচিতি"></textarea>
-            <textarea id="about-description2" placeholder="দ্বিতীয় পরিচিতি"></textarea>
-            <textarea id="about-points" placeholder="অঙ্গীকারের তালিকা: প্রতি লাইনে একটি বিষয়"></textarea>
-            <button type="submit">আমাদের সম্পর্কে সংরক্ষণ</button>
-          </form>
-
-          <hr>
-
-          <h3>২. কার্যক্রম</h3>
-
-<form id="activities-content-form">
-  <input id="activities-title" placeholder="শিরোনাম">
-  <input id="activities-subtitle" placeholder="উপশিরোনাম">
-
-  <hr>
-
-  <h4>নতুন কার্যক্রম যোগ করুন</h4>
-
-  <input
-    id="activity-item-title"
-    placeholder="কার্যক্রমের শিরোনাম"
-  >
-
-  <textarea
-    id="activity-item-description"
-    placeholder="কার্যক্রমের বিস্তারিত বিবরণ"
-  ></textarea>
-
-  <div class="actions">
-    <button id="activity-item-submit" type="button">
-      কার্যক্রম যোগ করুন
-    </button>
-
-    <button
-      id="activity-item-cancel"
-      type="button"
-      class="secondary hidden"
-    >
-      সম্পাদনা বাতিল
-    </button>
-  </div>
-
-  <h4>বর্তমান কার্যক্রমের তালিকা</h4>
-
-  <div id="activities-items-list">
-    কার্যক্রম লোড হচ্ছে...
-  </div>
-
-  <hr>
-
-  <button type="submit">সব কার্যক্রম সংরক্ষণ করুন</button>
-</form>
-
-          <hr>
-
-          <h3>৩. নোটিশ</h3>
-          <form id="public-notices-content-form">
-            <input id="public-notices-title" placeholder="নোটিশ বিভাগের শিরোনাম">
-            <input id="public-notices-subtitle" placeholder="উপশিরোনাম">
-            <textarea id="public-notices-items" placeholder="প্রতি লাইনে: শিরোনাম | বিবরণ | তারিখ | ক্যাটাগরি"></textarea>
-            <button type="submit">পাবলিক নোটিশ সংরক্ষণ</button>
-          </form>
-
-          <hr>
-
-          <h3>৪. যোগাযোগ</h3>
-          <form id="contact-content-form">
-            <input id="contact-title" placeholder="যোগাযোগের শিরোনাম">
-            <textarea id="contact-description" placeholder="যোগাযোগের বিবরণ"></textarea>
-            <input id="contact-phone" placeholder="ফোন নম্বর">
-            <input id="contact-email" type="email" placeholder="ইমেইল">
-            <input id="contact-address" placeholder="ঠিকানা">
-            <button type="submit">যোগাযোগের তথ্য সংরক্ষণ</button>
-          </form>
-
-        </div>
-      </div>
       
-      <div class="panel">
-        <h2>সদস্য ব্যবস্থাপনা</h2>
+      <div class="panel" id="members-section">
+        <div class="panel-head"><h2>সদস্য ব্যবস্থাপনা</h2>
         <p>নিচে Firestore-এ সংরক্ষিত সদস্যদের তথ্য দেখা যাবে।</p>
-
-        <hr>
-
-<h3>নতুন সদস্য যোগ করুন</h3>
-
-<div class="member">
-
-  <h4>পদ্ধতি ১: আগে থেকে থাকা Firebase Account</h4>
-
-  <form id="existing-member-form">
-
-    <input id="existing-member-uid"
-      type="text"
-      placeholder="Firebase Authentication UID"
-      required>
-
-    <input id="existing-member-name"
-      type="text"
-      placeholder="সদস্যের নাম"
-      required>
-
-    <input id="existing-member-email"
-      type="email"
-      placeholder="ইমেইল"
-      required>
-
-    <input id="existing-member-phone"
-      type="text"
-      placeholder="ফোন নম্বর">
-
-    <textarea id="existing-member-address"
-      placeholder="ঠিকানা"></textarea>
-
-    <select id="existing-member-role">
-      <option value="member">Member</option>
-      <option value="admin">Admin</option>
-    </select>
-
-    <button type="submit">Firestore-এ সদস্য যুক্ত করুন</button>
-
-    <div id="existing-member-status" class="status"></div>
-
-  </form>
-
-</div>
-
-<div class="member">
-
-  <h4>পদ্ধতি ২: নতুন Firebase Account তৈরি</h4>
-
-<h4>নতুন সদস্য তৈরি করুন</h4>
-
-<form id="new-member-form">
-
-  <input id="new-member-name"
-    type="text"
-    placeholder="সদস্যের নাম"
-    required>
-
-  <input id="new-member-email"
-    type="email"
-    placeholder="ইমেইল"
-    required>
-
-  <input id="new-member-password"
-    type="password"
-    placeholder="Password (কমপক্ষে ৬ অক্ষর)"
-    minlength="6"
-    required>
-
-  <button type="submit">নতুন সদস্য তৈরি করুন</button>
-
-  <div id="new-member-status" class="status"></div>
-
-</form>
-
-</div>
-
-<hr>
-        
-        <button id="reload-members">সদস্য তালিকা রিফ্রেশ</button>
+        <button id="reload-members">↻ সদস্য তালিকা রিফ্রেশ</button></div>
         <div id="members-status" class="status"></div>
         <div id="members-list"></div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="notice-create-section">
   <h2>বিশেষ নোটিশ প্রকাশ</h2>
   <form id="notice-form">
     <input
@@ -611,7 +87,7 @@ footer {
 
     <textarea
       id="notice-body"
-      maxlength="9000"
+      maxlength="5000"
       placeholder="নোটিশের বিস্তারিত"
       required
     ></textarea>
@@ -634,10 +110,12 @@ footer {
   <div id="notice-status" class="status" role="status"></div>
 </div>
 
-      <div class="panel">
-        <h2>বিশেষ নোটিশ ব্যবস্থাপনা</h2>
-        <button id="reload-notices" class="secondary">নোটিশ তালিকা রিফ্রেশ</button>
+      <div class="panel" id="notice-list-section">
+        <div class="panel-head"><h2>বিশেষ নোটিশ ব্যবস্থাপনা</h2>
+        <button id="reload-notices" class="secondary">↻ নোটিশ তালিকা রিফ্রেশ</button></div>
         <div id="special-notices-list"></div>
+      </div>
+        </div>
       </div>
     </section>
   </main>
@@ -669,20 +147,6 @@ var firebaseConfig = {
     var auth = firebase.auth();
     var db = firebase.firestore();
     var currentAdmin = null;
-
-    // Separate Firebase Authentication for creating new members
-var memberCreatorApp = firebase.apps.find(function(app) {
-  return app.name === "memberCreator";
-});
-
-if (!memberCreatorApp) {
-  memberCreatorApp = firebase.initializeApp(
-    firebaseConfig,
-    "memberCreator"
-  );
-}
-
-var memberCreatorAuth = memberCreatorApp.auth();
 
     var loginPanel = document.getElementById("login-panel");
     var adminPanel = document.getElementById("admin-panel");
@@ -735,7 +199,6 @@ var memberCreatorAuth = memberCreatorApp.auth();
         loadMembers();
         loadSpecialNotices();
         loadApplications();
-        loadSiteContent();
       } catch (error) {
         loginPanel.classList.remove("hidden");
         loginStatus.textContent =
@@ -745,6 +208,10 @@ var memberCreatorAuth = memberCreatorApp.auth();
     });
 
     document.getElementById("logout-button").addEventListener("click", function() {
+      auth.signOut();
+    });
+    document.getElementById("sidebar-logout").addEventListener("click", function(e) {
+      e.preventDefault();
       auth.signOut();
     });
 
@@ -975,7 +442,6 @@ async function loadSpecialNotices() {
 
       var content = document.createElement("p");
       content.textContent = data.body || "";
-      content.style.whiteSpace = "pre-wrap";
       card.appendChild(content);
 
       var actions = document.createElement("div");
@@ -1065,9 +531,7 @@ async function loadApplications() {
   status.textContent = "আবেদন লোড হচ্ছে...";
 
   try {
-    var snapshot = await db.collection("memberApplications")
-  .where("status", "==", "pending")
-  .get();
+    var snapshot = await db.collection("memberApplications").get();
 
     if (snapshot.empty) {
       status.textContent = "এখন কোনো অপেক্ষমাণ আবেদন নেই।";
@@ -1134,31 +598,24 @@ async function loadApplications() {
       reject.className = "danger";
 
       reject.addEventListener("click", async function() {
-  if (!currentAdmin) return;
+        if (!currentAdmin) return;
 
-  if (!confirm(
-    (data.name || "এই আবেদনকারী") +
-    " -এর আবেদন প্রত্যাখ্যান করবেন?"
-  )) return;
+        if (!confirm(
+          "এই আবেদনটি প্রত্যাখ্যান করে মুছে ফেলবেন?\n" +
+          "এতে Firebase Authentication অ্যাকাউন্ট মুছবে না।"
+        )) return;
 
-  reject.disabled = true;
+        reject.disabled = true;
 
-  try {
-    await db.collection("memberApplications")
-      .doc(doc.id)
-      .update({
-        status: "rejected",
-        rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
+        try {
+          await db.collection("memberApplications").doc(doc.id).delete();
+          alert("আবেদন প্রত্যাখ্যান করা হয়েছে।");
+          await loadApplications();
+        } catch (error) {
+          alert("প্রত্যাখ্যান ব্যর্থ হয়েছে: " + error.message);
+          reject.disabled = false;
+        }
       });
-
-    alert("আবেদন প্রত্যাখ্যান করা হয়েছে।");
-    await loadApplications();
-
-  } catch (error) {
-    alert("প্রত্যাখ্যান ব্যর্থ হয়েছে: " + error.message);
-    reject.disabled = false;
-  }
-});
 
       actions.appendChild(approve);
       actions.appendChild(reject);
@@ -1172,453 +629,6 @@ async function loadApplications() {
 
   document.getElementById("reload-applications")
   .addEventListener("click", loadApplications);
-
-// ======================================
-// WEBSITE CONTENT MANAGEMENT
-// ======================================
-
-var siteContentRef = db.collection("siteContent").doc("publicSections");
-
-function linesToList(value) {
-  return value.split("\n")
-    .map(function(line) { return line.trim(); })
-    .filter(function(line) { return line.length > 0; });
-}
-
-function parseItems(value, fields) {
-  return linesToList(value).map(function(line) {
-    var parts = line.split("|").map(function(part) {
-      return part.trim();
-    });
-
-    var item = {};
-    fields.forEach(function(field, index) {
-      item[field] = parts[index] || "";
-    });
-    return item;
-  });
-}
-
-function formatItems(items, fields) {
-  if (!Array.isArray(items)) return "";
-
-  return items.map(function(item) {
-    return fields.map(function(field) {
-      return item[field] || "";
-    }).join(" | ");
-  }).join("\n");
-}
-
-// ======================================
-// ACTIVITIES CREATE, EDIT AND DELETE
-// ======================================
-
-var activitiesItems = [];
-var editingActivityIndex = -1;
-
-function renderActivitiesItems() {
-  var list = document.getElementById("activities-items-list");
-  list.replaceChildren();
-
-  if (activitiesItems.length === 0) {
-    list.textContent = "এখনো কোনো কার্যক্রম যোগ করা হয়নি।";
-    return;
-  }
-
-  activitiesItems.forEach(function(item, index) {
-    var card = document.createElement("div");
-    card.className = "notice";
-
-    var heading = document.createElement("strong");
-    heading.textContent = "কার্যক্রম " + (index + 1) + ": " + item.title;
-    card.appendChild(heading);
-
-    var description = document.createElement("p");
-    description.textContent = item.description;
-    card.appendChild(description);
-
-    var actions = document.createElement("div");
-    actions.className = "actions";
-
-    var edit = document.createElement("button");
-    edit.type = "button";
-    edit.textContent = "সম্পাদনা";
-
-    edit.addEventListener("click", function() {
-      editingActivityIndex = index;
-
-      document.getElementById("activity-item-title").value =
-        item.title || "";
-
-      document.getElementById("activity-item-description").value =
-        item.description || "";
-
-      document.getElementById("activity-item-submit").textContent =
-        "পরিবর্তন আপডেট করুন";
-
-      document.getElementById("activity-item-cancel")
-        .classList.remove("hidden");
-
-      document.getElementById("activity-item-title")
-        .scrollIntoView({ behavior: "smooth", block: "center" });
-    });
-
-    var remove = document.createElement("button");
-    remove.type = "button";
-    remove.textContent = "মুছে ফেলুন";
-    remove.className = "danger";
-
-    remove.addEventListener("click", function() {
-      if (!confirm("এই কার্যক্রমটি মুছে ফেলতে চান?")) return;
-
-      activitiesItems.splice(index, 1);
-      editingActivityIndex = -1;
-
-      renderActivitiesItems();
-      resetActivityEditor();
-    });
-
-    actions.appendChild(edit);
-    actions.appendChild(remove);
-
-    card.appendChild(actions);
-    list.appendChild(card);
-  });
-}
-
-function resetActivityEditor() {
-  editingActivityIndex = -1;
-
-  document.getElementById("activity-item-title").value = "";
-  document.getElementById("activity-item-description").value = "";
-
-  document.getElementById("activity-item-submit").textContent =
-    "কার্যক্রম যোগ করুন";
-
-  document.getElementById("activity-item-cancel")
-    .classList.add("hidden");
-}
-
-document.getElementById("activity-item-submit")
-  .addEventListener("click", function() {
-    var title = document.getElementById("activity-item-title").value.trim();
-    var description = document.getElementById("activity-item-description").value.trim();
-
-    if (!title || !description) {
-      alert("কার্যক্রমের শিরোনাম ও বিবরণ লিখুন।");
-      return;
-    }
-
-    var item = {
-      title: title,
-      description: description
-    };
-
-    if (editingActivityIndex >= 0) {
-      activitiesItems[editingActivityIndex] = item;
-    } else {
-      activitiesItems.push(item);
-    }
-
-    renderActivitiesItems();
-    resetActivityEditor();
-  });
-
-document.getElementById("activity-item-cancel")
-  .addEventListener("click", resetActivityEditor);
-    
-async function loadSiteContent() {
-  if (!currentAdmin) return;
-
-  var status = document.getElementById("content-management-status");
-  status.textContent = "ওয়েবসাইটের কনটেন্ট লোড হচ্ছে...";
-
-  try {
-    var snapshot = await siteContentRef.get();
-
-    if (!snapshot.exists) {
-      status.textContent =
-        "এখনো কোনো কনটেন্ট সংরক্ষণ করা হয়নি। নতুন তথ্য লিখে Save করুন।";
-      return;
-    }
-
-    var data = snapshot.data();
-
-    var about = data.about || {};
-    document.getElementById("about-title").value = about.title || "";
-    document.getElementById("about-subtitle").value = about.subtitle || "";
-    document.getElementById("about-description").value = about.description || "";
-    document.getElementById("about-description2").value = about.description2 || "";
-    document.getElementById("about-points").value =
-      Array.isArray(about.points) ? about.points.join("\n") : "";
-
-    var activities = data.activities || {};
-
-document.getElementById("activities-title").value =
-  activities.title || "";
-
-document.getElementById("activities-subtitle").value =
-  activities.subtitle || "";
-
-activitiesItems = Array.isArray(activities.items)
-  ? activities.items.map(function(item) {
-      return {
-        title: item.title || "",
-        description: item.description || ""
-      };
-    })
-  : [];
-
-renderActivitiesItems();
-resetActivityEditor();
-
-    var notices = data.notices || {};
-    document.getElementById("public-notices-title").value = notices.title || "";
-    document.getElementById("public-notices-subtitle").value = notices.subtitle || "";
-    document.getElementById("public-notices-items").value =
-      formatItems(notices.items, ["title", "body", "date", "category"]);
-
-    var contact = data.contact || {};
-    document.getElementById("contact-title").value = contact.title || "";
-    document.getElementById("contact-description").value = contact.description || "";
-    document.getElementById("contact-phone").value = contact.phone || "";
-    document.getElementById("contact-email").value = contact.email || "";
-    document.getElementById("contact-address").value = contact.address || "";
-
-    status.textContent = "সংরক্ষিত কনটেন্ট লোড হয়েছে।";
-  } catch (error) {
-    status.textContent = "কনটেন্ট লোড করা যায়নি: " + error.message;
-    console.error(error);
-  }
-}
-
-async function saveSiteSection(section, content, formId) {
-  if (!currentAdmin) {
-    alert("প্রথমে Admin হিসেবে লগইন করুন।");
-    return;
-  }
-
-  var status = document.getElementById("content-management-status");
-  var button = document.querySelector("#" + formId + " button[type='submit']");
-
-  button.disabled = true;
-  status.textContent = "তথ্য Firebase-এ সংরক্ষণ হচ্ছে...";
-
-  try {
-    var update = {};
-    update[section] = content;
-    update.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
-    update.updatedBy = currentAdmin.uid;
-
-    await siteContentRef.set(update, { merge: true });
-
-    status.textContent = "সফলভাবে সংরক্ষণ হয়েছে: " + section;
-    alert("তথ্য সফলভাবে Firebase-এ সংরক্ষণ হয়েছে।");
-  } catch (error) {
-    status.textContent = "সংরক্ষণ ব্যর্থ হয়েছে: " + error.message;
-    console.error(error);
-  } finally {
-    button.disabled = false;
-  }
-}
-
-// About section
-document.getElementById("about-content-form")
-  .addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    saveSiteSection("about", {
-      title: document.getElementById("about-title").value.trim(),
-      subtitle: document.getElementById("about-subtitle").value.trim(),
-      description: document.getElementById("about-description").value.trim(),
-      description2: document.getElementById("about-description2").value.trim(),
-      points: linesToList(document.getElementById("about-points").value)
-    }, "about-content-form");
-  });
-
-// Activities section
-// Activities section
-document.getElementById("activities-content-form")
-  .addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    saveSiteSection("activities", {
-      title: document.getElementById("activities-title").value.trim(),
-      subtitle: document.getElementById("activities-subtitle").value.trim(),
-      items: activitiesItems
-    }, "activities-content-form");
-  });
-
-// Public notices section
-document.getElementById("public-notices-content-form")
-  .addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    saveSiteSection("notices", {
-      title: document.getElementById("public-notices-title").value.trim(),
-      subtitle: document.getElementById("public-notices-subtitle").value.trim(),
-      items: parseItems(
-        document.getElementById("public-notices-items").value,
-        ["title", "body", "date", "category"]
-      )
-    }, "public-notices-content-form");
-  });
-
-// Contact section
-document.getElementById("contact-content-form")
-  .addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    saveSiteSection("contact", {
-      title: document.getElementById("contact-title").value.trim(),
-      description: document.getElementById("contact-description").value.trim(),
-      phone: document.getElementById("contact-phone").value.trim(),
-      email: document.getElementById("contact-email").value.trim(),
-      address: document.getElementById("contact-address").value.trim()
-    }, "contact-content-form");
-  });
-
-
-    
-// ======================================
-// ADD EXISTING FIREBASE USER TO MEMBERS
-// ======================================
-
-document.getElementById("existing-member-form")
-  .addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    if (!currentAdmin) {
-      alert("প্রথমে Admin হিসেবে লগইন করুন।");
-      return;
-    }
-
-    var status = document.getElementById("existing-member-status");
-    var button = this.querySelector("button[type='submit']");
-
-    var uid = document.getElementById("existing-member-uid").value.trim();
-    var name = document.getElementById("existing-member-name").value.trim();
-    var email = document.getElementById("existing-member-email").value.trim();
-    var phone = document.getElementById("existing-member-phone").value.trim();
-    var address = document.getElementById("existing-member-address").value.trim();
-    var role = document.getElementById("existing-member-role").value;
-
-    button.disabled = true;
-    status.textContent = "সদস্য যুক্ত হচ্ছে...";
-
-    try {
-      var memberRef = db.collection("members").doc(uid);
-      var existing = await memberRef.get();
-
-      if (existing.exists) {
-        throw new Error("এই UID দিয়ে সদস্য রেকর্ড আগে থেকেই আছে।");
-      }
-
-      await memberRef.set({
-        name: name,
-        email: email,
-        phone: phone,
-        address: address,
-        photoURL: "",
-        role: role,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      status.textContent = "সদস্য সফলভাবে যুক্ত হয়েছে।";
-      this.reset();
-
-      await loadMembers();
-
-    } catch (error) {
-      status.textContent = "সদস্য যুক্ত করা যায়নি: " + error.message;
-      console.error(error);
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-
-// ======================================
-// CREATE NEW FIREBASE MEMBER ACCOUNT
-// ======================================
-
-document.getElementById("new-member-form")
-  .addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    if (!currentAdmin) {
-      alert("প্রথমে Admin হিসেবে লগইন করুন।");
-      return;
-    }
-
-    var status = document.getElementById("new-member-status");
-    var button = this.querySelector("button[type='submit']");
-
-    var name = document.getElementById("new-member-name").value.trim();
-    var email = document.getElementById("new-member-email").value.trim();
-    var password = document.getElementById("new-member-password").value;
-    var phone = document.getElementById("new-member-phone").value.trim();
-    var address = document.getElementById("new-member-address").value.trim();
-    var role = document.getElementById("new-member-role").value;
-
-    button.disabled = true;
-    status.textContent = "নতুন Firebase Account তৈরি হচ্ছে...";
-
-    var newUid = null;
-
-    try {
-      var credential =
-        await memberCreatorAuth.createUserWithEmailAndPassword(
-          email,
-          password
-        );
-
-      newUid = credential.user.uid;
-
-      status.textContent = "Account তৈরি হয়েছে। সদস্যের তথ্য সংরক্ষণ হচ্ছে...";
-
-      await db.collection("members").doc(newUid).set({
-  name: name,
-  email: email,
-  phone: "",
-  address: "",
-  photoURL: "",
-  role: "member",
-  createdAt: firebase.firestore.FieldValue.serverTimestamp()
-});
-
-      await memberCreatorAuth.signOut();
-
-      status.textContent = "নতুন সদস্য সফলভাবে তৈরি হয়েছে। UID: " + newUid;
-
-      this.reset();
-      await loadMembers();
-
-      alert("নতুন সদস্যের Account ও Firestore Record তৈরি হয়েছে।");
-
-    } catch (error) {
-      if (memberCreatorAuth.currentUser) {
-        await memberCreatorAuth.signOut().catch(function(signOutError) {
-          console.error(signOutError);
-        });
-      }
-
-      if (newUid) {
-        status.textContent =
-          "Firebase Account তৈরি হয়েছে, কিন্তু Firestore Record তৈরি হয়নি। UID: " +
-          newUid + "। Error: " + error.message;
-      } else {
-        status.textContent = "Account তৈরি করা যায়নি: " + error.message;
-      }
-
-      console.error(error);
-
-    } finally {
-      button.disabled = false;
-    }
-  });
-
-
     
   </script>
 </body>
