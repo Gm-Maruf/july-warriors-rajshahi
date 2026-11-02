@@ -752,7 +752,9 @@ async function loadApplications() {
   status.textContent = "আবেদন লোড হচ্ছে...";
 
   try {
-    var snapshot = await db.collection("memberApplications").get();
+    var snapshot = await db.collection("memberApplications")
+  .where("status", "==", "pending")
+  .get();
 
     if (snapshot.empty) {
       status.textContent = "এখন কোনো অপেক্ষমাণ আবেদন নেই।";
@@ -819,24 +821,31 @@ async function loadApplications() {
       reject.className = "danger";
 
       reject.addEventListener("click", async function() {
-        if (!currentAdmin) return;
+  if (!currentAdmin) return;
 
-        if (!confirm(
-          "এই আবেদনটি প্রত্যাখ্যান করে মুছে ফেলবেন?\n" +
-          "এতে Firebase Authentication অ্যাকাউন্ট মুছবে না।"
-        )) return;
+  if (!confirm(
+    (data.name || "এই আবেদনকারী") +
+    " -এর আবেদন প্রত্যাখ্যান করবেন?"
+  )) return;
 
-        reject.disabled = true;
+  reject.disabled = true;
 
-        try {
-          await db.collection("memberApplications").doc(doc.id).delete();
-          alert("আবেদন প্রত্যাখ্যান করা হয়েছে।");
-          await loadApplications();
-        } catch (error) {
-          alert("প্রত্যাখ্যান ব্যর্থ হয়েছে: " + error.message);
-          reject.disabled = false;
-        }
+  try {
+    await db.collection("memberApplications")
+      .doc(doc.id)
+      .update({
+        status: "rejected",
+        rejectedAt: firebase.firestore.FieldValue.serverTimestamp()
       });
+
+    alert("আবেদন প্রত্যাখ্যান করা হয়েছে।");
+    await loadApplications();
+
+  } catch (error) {
+    alert("প্রত্যাখ্যান ব্যর্থ হয়েছে: " + error.message);
+    reject.disabled = false;
+  }
+});
 
       actions.appendChild(approve);
       actions.appendChild(reject);
