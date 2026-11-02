@@ -298,7 +298,7 @@
 
     <textarea
       id="notice-body"
-      maxlength="5000"
+      maxlength="9000"
       placeholder="নোটিশের বিস্তারিত"
       required
     ></textarea>
@@ -662,6 +662,7 @@ async function loadSpecialNotices() {
 
       var content = document.createElement("p");
       content.textContent = data.body || "";
+      content.style.whiteSpace = "pre-wrap";
       card.appendChild(content);
 
       var actions = document.createElement("div");
