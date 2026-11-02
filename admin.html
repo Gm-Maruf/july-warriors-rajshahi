@@ -201,6 +201,96 @@
       <div class="panel">
         <h2>সদস্য ব্যবস্থাপনা</h2>
         <p>নিচে Firestore-এ সংরক্ষিত সদস্যদের তথ্য দেখা যাবে।</p>
+
+        <hr>
+
+<h3>নতুন সদস্য যোগ করুন</h3>
+
+<div class="member">
+
+  <h4>পদ্ধতি ১: আগে থেকে থাকা Firebase Account</h4>
+
+  <form id="existing-member-form">
+
+    <input id="existing-member-uid"
+      type="text"
+      placeholder="Firebase Authentication UID"
+      required>
+
+    <input id="existing-member-name"
+      type="text"
+      placeholder="সদস্যের নাম"
+      required>
+
+    <input id="existing-member-email"
+      type="email"
+      placeholder="ইমেইল"
+      required>
+
+    <input id="existing-member-phone"
+      type="text"
+      placeholder="ফোন নম্বর">
+
+    <textarea id="existing-member-address"
+      placeholder="ঠিকানা"></textarea>
+
+    <select id="existing-member-role">
+      <option value="member">Member</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button type="submit">Firestore-এ সদস্য যুক্ত করুন</button>
+
+    <div id="existing-member-status" class="status"></div>
+
+  </form>
+
+</div>
+
+<div class="member">
+
+  <h4>পদ্ধতি ২: নতুন Firebase Account তৈরি</h4>
+
+  <form id="new-member-form">
+
+    <input id="new-member-name"
+      type="text"
+      placeholder="সদস্যের নাম"
+      required>
+
+    <input id="new-member-email"
+      type="email"
+      placeholder="ইমেইল"
+      required>
+
+    <input id="new-member-password"
+      type="password"
+      placeholder="প্রাথমিক Password (কমপক্ষে ৬ অক্ষর)"
+      minlength="6"
+      required>
+
+    <input id="new-member-phone"
+      type="text"
+      placeholder="ফোন নম্বর">
+
+    <textarea id="new-member-address"
+      placeholder="ঠিকানা"></textarea>
+
+    <select id="new-member-role">
+      <option value="member">Member</option>
+      <option value="admin">Admin</option>
+    </select>
+
+    <button type="submit">নতুন Account তৈরি করুন</button>
+
+    <div id="new-member-status" class="status"></div>
+
+  </form>
+
+</div>
+
+<hr>
+        
         <button id="reload-members">সদস্য তালিকা রিফ্রেশ</button>
         <div id="members-status" class="status"></div>
         <div id="members-list"></div>
