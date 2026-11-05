@@ -474,6 +474,19 @@ footer { background:light-dark(#12271e,#0d1712); color:#f4f7f4; padding:40px 0 2
     লগআউট
   </button>
 
+
+  <!-- MEMBER SPECIAL NOTICES -->
+<div id="member-special-notices" style="margin-top:25px">
+
+  <h3 style="margin-bottom:15px">
+    বিশেষ নোটিশ
+  </h3>
+
+  <div id="member-special-notice-list">
+    <p>বিশেষ নোটিশ লোড হচ্ছে...</p>
+  </div>
+
+</div>
   <div id="profile-message" role="status"></div>
 
   <p style="font-size:12px;color:var(--muted);margin-top:12px">
@@ -699,28 +712,47 @@ var specialNoticesUnsubscribe = null;
 
 function loadSpecialNoticesForMember(user) {
   var grid = document.getElementById('notice-grid');
+  var dashboardList = document.getElementById('member-special-notice-list');
 
+  // আগের Firebase listener বন্ধ করা
   if (specialNoticesUnsubscribe) {
     specialNoticesUnsubscribe();
     specialNoticesUnsubscribe = null;
   }
 
-  grid.querySelectorAll('.firebase-special-notice')
-    .forEach(function(card) {
-      card.remove();
-    });
+  // দুই জায়গা থেকেই আগের বিশেষ নোটিশ সরানো
+  if (grid) {
+    grid.querySelectorAll('.firebase-special-notice')
+      .forEach(function(card) {
+        card.remove();
+      });
+  }
 
+  if (dashboardList) {
+    dashboardList.replaceChildren();
+  }
+
+  // লগইন না থাকলে নোটিশ দেখাবে না
   if (!user) {
+    if (dashboardList) {
+      dashboardList.textContent = 'বিশেষ নোটিশ দেখতে সদস্য হিসেবে লগইন করুন।';
+    }
+
     refreshNoticeCards();
     return;
   }
 
+  // সদস্যের অনুমোদন যাচাই
   firebase.firestore()
     .collection('members')
     .doc(user.uid)
     .get()
     .then(function(memberDoc) {
+
       if (!memberDoc.exists) {
+        if (dashboardList) {
+          dashboardList.textContent = 'অনুমোদিত সদস্যদের জন্য এই নোটিশগুলো সংরক্ষিত।';
+        }
         refreshNoticeCards();
         return;
       }
@@ -731,59 +763,107 @@ function loadSpecialNoticesForMember(user) {
         memberData.role !== 'member' &&
         memberData.role !== 'admin'
       ) {
+        if (dashboardList) {
+          dashboardList.textContent = 'আপনার এই নোটিশ দেখার অনুমতি নেই।';
+        }
         refreshNoticeCards();
         return;
       }
 
+      // অনুমোদিত সদস্যের জন্য Live Special Notices
       specialNoticesUnsubscribe = firebase.firestore()
         .collection('specialNotices')
         .orderBy('createdAt', 'desc')
         .onSnapshot(function(snapshot) {
-          grid.querySelectorAll('.firebase-special-notice')
-            .forEach(function(card) {
-              card.remove();
-            });
+
+          if (grid) {
+            grid.querySelectorAll('.firebase-special-notice')
+              .forEach(function(card) {
+                card.remove();
+              });
+          }
+
+          if (dashboardList) {
+            dashboardList.replaceChildren();
+          }
+
+          if (snapshot.empty) {
+            if (dashboardList) {
+              dashboardList.textContent = 'বর্তমানে কোনো বিশেষ নোটিশ নেই।';
+            }
+
+            refreshNoticeCards();
+            return;
+          }
 
           snapshot.forEach(function(doc) {
             var data = doc.data();
-            var card = document.createElement('article');
 
-            card.className = 'notice firebase-special-notice';
-            card.setAttribute('data-notice-category', 'org');
-
-            var label = document.createElement('div');
-            label.className = 'notice-date';
-            label.textContent = 'বিশেষ নোটিশ';
-
-            var heading = document.createElement('h3');
-            heading.textContent = data.title || 'শিরোনাম নেই';
-
-            var content = document.createElement('p');
-content.textContent = data.body || '';
-content.style.whiteSpace = 'pre-wrap';
-
-            card.appendChild(label);
-            card.appendChild(heading);
-            card.appendChild(content);
-
-            if (data.createdAt && data.createdAt.toDate) {
-              var date = document.createElement('small');
-              date.textContent = 'প্রকাশের তারিখ: ' +
-                data.createdAt.toDate().toLocaleDateString('bn-BD');
-              card.appendChild(date);
+            // Homepage-এর নোটিশ কার্ড
+            if (grid) {
+              var homeCard = createSpecialNoticeCard(data);
+              homeCard.classList.add('firebase-special-notice');
+              grid.appendChild(homeCard);
             }
 
-            grid.appendChild(card);
+            // Member Dashboard-এর নোটিশ কার্ড
+            if (dashboardList) {
+              var memberCard = createSpecialNoticeCard(data);
+              memberCard.classList.add('firebase-special-notice');
+              dashboardList.appendChild(memberCard);
+            }
           });
 
           refreshNoticeCards();
+
         }, function(error) {
           console.error('বিশেষ নোটিশ আপডেট করা যায়নি:', error);
+
+          if (dashboardList) {
+            dashboardList.textContent = 'বিশেষ নোটিশ লোড করা যায়নি।';
+          }
         });
     })
     .catch(function(error) {
       console.error('সদস্য যাচাই বা নোটিশ লোড করা যায়নি:', error);
+
+      if (dashboardList) {
+        dashboardList.textContent = 'নোটিশ লোড করতে সমস্যা হয়েছে।';
+      }
     });
+}
+
+
+// দুই জায়গার জন্য একই নোটিশ কার্ড তৈরি
+function createSpecialNoticeCard(data) {
+  var card = document.createElement('article');
+  card.className = 'notice';
+  card.setAttribute('data-notice-category', 'org');
+
+  var label = document.createElement('div');
+  label.className = 'notice-date';
+  label.textContent = 'বিশেষ নোটিশ';
+
+  var heading = document.createElement('h3');
+  heading.textContent = data.title || 'শিরোনাম নেই';
+
+  var content = document.createElement('p');
+  content.textContent = data.body || '';
+  content.style.whiteSpace = 'pre-wrap';
+
+  card.appendChild(label);
+  card.appendChild(heading);
+  card.appendChild(content);
+
+  if (data.createdAt && data.createdAt.toDate) {
+    var date = document.createElement('small');
+    date.textContent = 'প্রকাশের তারিখ: ' +
+      data.createdAt.toDate().toLocaleDateString('bn-BD');
+
+    card.appendChild(date);
+  }
+
+  return card;
 }
 function refreshNoticeCards() {
   noticeCards = Array.from(
