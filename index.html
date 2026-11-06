@@ -277,6 +277,7 @@ footer{background:light-dark(#12271e,#0d1712);color:#f4f7f4;padding:40px 0 22px}
         <a href="#dashboard-profile">▤ আমার প্রোফাইল</a>
         <a href="#dashboard-notices">▣ বিশেষ নোটিশ</a>
         <a href="#dashboard-activities">✦ কার্যক্রম ও সভা</a>
+        <a href="#dashboard-cv">▤ আমার সিভি</a>
         <a href="#home" onclick="returnToHomepage(event)">⌂ মূল ওয়েবসাইট</a>
       </nav>
       <div class="sidebar-bottom"><button class="btn btn-secondary" onclick="logoutMember()">লগআউট</button></div>
@@ -318,6 +319,17 @@ footer{background:light-dark(#12271e,#0d1712);color:#f4f7f4;padding:40px 0 22px}
         <p style="font-size:13px;color:var(--muted)">ওয়েবসাইটের কার্যক্রম বিভাগে প্রকাশিত তথ্য এখানে দেখানো হবে।</p>
         <div id="member-activities-list" class="notice-grid"><p>কার্যক্রম লোড হচ্ছে...</p></div>
       </section>
+      <section id="dashboard-cv" class="dashboard-card">
+        <h2 class="dashboard-section-title">আমার সিভি</h2>
+        <p style="font-size:13px;color:var(--muted)">শুধুমাত্র PDF ফাইল আপলোড করা যাবে। সর্বোচ্চ ফাইল সাইজ ৫ MB। নতুন CV আপলোড করলে আগেরটি প্রতিস্থাপিত হবে।</p>
+        <div id="member-cv-current" style="margin:12px 0;color:var(--muted)">আপনার CV-এর তথ্য লোড হচ্ছে...</div>
+        <form id="member-cv-form">
+          <label class="form-label" for="member-cv-file">PDF CV নির্বাচন করুন</label>
+          <input class="form-input" id="member-cv-file" type="file" accept="application/pdf,.pdf" required>
+          <button class="btn btn-primary" id="member-cv-upload-button" type="submit" style="margin-top:12px">CV আপলোড / পরিবর্তন করুন</button>
+        </form>
+        <div id="member-cv-message" class="dashboard-message" role="status" aria-live="polite"></div>
+      </section>
       <button class="btn btn-outline" onclick="logoutMember()">লগআউট</button>
     </main>
   </div>
@@ -338,6 +350,67 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION).catch(function(error){console.error('Session persistence error:',error);});
+
+// Supabase CV service configuration. Replace only the publishable key placeholder.
+const CV_FUNCTION_URL = 'https://bdwxycxgpkxjxlupumyb.supabase.co/functions/v1/member-cv-manager';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_ATutIxSZ5EHusI01zhX6lQ_KCLLjeD2';
+
+async function callCVFunction(action, options) {
+  var user = firebase.auth().currentUser;
+  if (!user) throw new Error('প্রথমে সদস্য হিসেবে লগইন করুন।');
+  var token = await user.getIdToken();
+  var requestOptions = options || {};
+  requestOptions.headers = Object.assign({}, requestOptions.headers || {}, {
+    'Authorization': 'Bearer ' + token,
+    'apikey': SUPABASE_PUBLISHABLE_KEY
+  });
+  if (requestOptions.body && !(requestOptions.body instanceof FormData)) {
+    requestOptions.headers['Content-Type'] = 'application/json';
+  }
+  var response = await fetch(CV_FUNCTION_URL, requestOptions);
+  var result = await response.json().catch(function(){ return {}; });
+  if (!response.ok) throw new Error(result.error || 'CV সার্ভিসে সমস্যা হয়েছে।');
+  return result;
+}
+
+async function loadMyCV() {
+  var box = document.getElementById('member-cv-current');
+  if (!box || !firebase.auth().currentUser) return;
+  box.textContent = 'CV-এর তথ্য লোড হচ্ছে...';
+  try {
+    var result = await callCVFunction('my-cv', { method: 'POST', body: JSON.stringify({ action: 'my-cv' }) });
+    box.replaceChildren();
+    if (!result.exists) { box.textContent = 'এখনো কোনো CV আপলোড করা হয়নি।'; return; }
+    var name = document.createElement('strong'); name.textContent = result.fileName || 'CV.pdf';
+    var date = document.createElement('p'); date.style.margin = '5px 0';
+    date.textContent = 'আপলোডের তারিখ: ' + new Date(result.uploadedAt).toLocaleString('bn-BD');
+    var link = document.createElement('a'); link.href = result.downloadUrl; link.target = '_blank'; link.rel = 'noopener';
+    link.className = 'btn btn-outline'; link.textContent = 'আমার CV ডাউনলোড করুন';
+    box.append(name, date, link);
+  } catch (error) {
+    box.textContent = 'CV-এর তথ্য লোড করা যায়নি: ' + error.message;
+  }
+}
+
+document.getElementById('member-cv-form').addEventListener('submit', async function(event) {
+  event.preventDefault();
+  var input = document.getElementById('member-cv-file');
+  var button = document.getElementById('member-cv-upload-button');
+  var message = document.getElementById('member-cv-message');
+  var file = input.files && input.files[0];
+  if (!file) { message.textContent = 'প্রথমে PDF ফাইল নির্বাচন করুন।'; return; }
+  if (file.type !== 'application/pdf' || !file.name.toLowerCase().endsWith('.pdf')) { message.textContent = 'শুধুমাত্র PDF ফাইল গ্রহণযোগ্য।'; return; }
+  if (file.size <= 0 || file.size > 5 * 1024 * 1024) { message.textContent = 'ফাইলের সাইজ ৫ MB-এর বেশি হতে পারবে না।'; return; }
+  button.disabled = true; message.textContent = 'CV আপলোড হচ্ছে...';
+  try {
+    var form = new FormData(); form.append('action', 'upload'); form.append('file', file, file.name);
+    await callCVFunction('', { method: 'POST', body: form });
+    message.textContent = 'আপনার CV সফলভাবে আপলোড হয়েছে।';
+    input.value = ''; await loadMyCV();
+  } catch (error) {
+    message.textContent = 'CV আপলোড করা যায়নি: ' + error.message;
+  } finally { button.disabled = false; }
+});
 
 function openLogin(){
   if(firebase.auth().currentUser){showMemberDashboard();return;}
@@ -438,6 +511,7 @@ function loadMemberProfile(user,fromLogin){
       photo.onerror=function(){photo.hidden=true;};
     }else{photo.removeAttribute('src');photo.hidden=true;}
     showMemberDashboard();
+    loadMyCV();
     if(message)message.textContent='আপনার সদস্য-তথ্য লোড হয়েছে।';
     return data;
   }).catch(function(error){
@@ -590,6 +664,8 @@ function logoutMember(){
     hideMemberDashboard();
     document.getElementById('member-pass').value='';
     document.getElementById('profile-message').textContent='';
+    document.getElementById('member-cv-message').textContent='';
+    document.getElementById('member-cv-current').textContent='লগইন করলে CV-এর তথ্য দেখা যাবে।';
     document.getElementById('login-message').textContent='আপনি লগআউট করেছেন।';
   }).catch(function(error){
     document.getElementById('login-message').textContent='লগআউট করা যায়নি: '+error.code;
