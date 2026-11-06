@@ -71,6 +71,7 @@
           <div class="nav-group"><button class="nav-link" data-view="activities-view"><span class="nav-icon">✦</span>কার্যক্রম</button></div>
           <div class="nav-group"><button class="nav-link" data-view="notices-view"><span class="nav-icon">▣</span>নোটিশ ব্যবস্থাপনা</button></div>
           <div class="nav-group"><button class="nav-link" data-view="contact-view"><span class="nav-icon">✉</span>যোগাযোগ</button></div>
+          <div class="nav-group"><button class="nav-link" data-view="member-cvs-view"><span class="nav-icon">▤</span>সদস্যদের CV</button></div>
         </aside>
         <div class="main-area">
           <div class="welcome"><div><h2>স্বাগতম, Admin</h2><p id="admin-welcome"></p></div><p>ঐক্য • সাহস • অধিকার</p></div>
@@ -83,6 +84,10 @@
           <section id="activities-view" class="view"><div class="view-head"><h2>কার্যক্রম</h2><p>কার্যক্রমের শিরোনাম, বিবরণ ও তালিকা পরিচালনা করুন।</p></div><div class="panel"><form id="activities-content-form"><input id="activities-title" placeholder="শিরোনাম"><input id="activities-subtitle" placeholder="উপশিরোনাম"><hr class="divider"><h3>নতুন কার্যক্রম যোগ করুন</h3><input id="activity-item-title" placeholder="কার্যক্রমের শিরোনাম"><textarea id="activity-item-description" placeholder="কার্যক্রমের বিস্তারিত বিবরণ"></textarea><div class="actions"><button id="activity-item-submit" type="button">কার্যক্রম যোগ করুন</button><button id="activity-item-cancel" type="button" class="secondary hidden">সম্পাদনা বাতিল</button></div><h3 class="subheading">বর্তমান কার্যক্রমের তালিকা</h3><div id="activities-items-list">কার্যক্রম লোড হচ্ছে...</div><hr class="divider"><button type="submit">সব কার্যক্রম সংরক্ষণ করুন</button></form></div></section>
           <section id="notices-view" class="view"><div class="view-head"><h2>নোটিশ ব্যবস্থাপনা</h2><p>পাবলিক নোটিশ ও সদস্যদের জন্য বিশেষ নোটিশ পরিচালনা করুন।</p></div><div class="panel"><h3>নোটিশ</h3><form id="public-notices-content-form"><input id="public-notices-title" placeholder="নোটিশ বিভাগের শিরোনাম"><input id="public-notices-subtitle" placeholder="উপশিরোনাম"><textarea id="public-notices-items" placeholder="প্রতি লাইনে: শিরোনাম | বিবরণ | তারিখ | ক্যাটাগরি"></textarea><button type="submit">পাবলিক নোটিশ সংরক্ষণ</button></form></div><div class="panel"><h3>বিশেষ নোটিশ প্রকাশ</h3><form id="notice-form"><input id="notice-title" maxlength="150" placeholder="নোটিশের শিরোনাম" required><textarea id="notice-body" maxlength="9000" placeholder="নোটিশের বিস্তারিত" required></textarea><div class="actions"><button id="notice-submit" type="submit">নোটিশ প্রকাশ করুন</button><button id="notice-cancel" type="button" class="secondary hidden">সম্পাদনা বাতিল</button></div></form><div id="notice-status" class="status" role="status"></div></div><div class="panel"><div class="member-tools"><h3>বিশেষ নোটিশ ব্যবস্থাপনা</h3><button id="reload-notices" class="secondary">নোটিশ তালিকা রিফ্রেশ</button></div><div id="special-notices-list"></div></div></section>
           <section id="contact-view" class="view"><div class="view-head"><h2>যোগাযোগ</h2><p>ওয়েবসাইটের যোগাযোগের তথ্য হালনাগাদ করুন।</p></div><div class="panel"><form id="contact-content-form"><input id="contact-title" placeholder="যোগাযোগের শিরোনাম"><textarea id="contact-description" placeholder="যোগাযোগের বিবরণ"></textarea><div class="form-grid"><input id="contact-phone" placeholder="ফোন নম্বর"><input id="contact-email" type="email" placeholder="ইমেইল"><input id="contact-address" class="full" placeholder="ঠিকানা"></div><button type="submit">যোগাযোগের তথ্য সংরক্ষণ</button></form></div></section>
+          <section id="member-cvs-view" class="view">
+            <div class="view-head"><h2>সদস্যদের CV</h2><p>যেসব সদস্য CV আপলোড করেছেন, তাদের তথ্য ও CV ডাউনলোড করুন।</p></div>
+            <div class="panel"><div class="member-tools"><h3>CV তালিকা</h3><button id="reload-member-cvs">↻ CV তালিকা রিফ্রেশ</button></div><div id="member-cvs-status" class="status">তালিকা লোড করা হয়নি।</div><div id="member-cvs-list"></div></div>
+          </section>
           <div id="content-management-status" class="status"></div>
         </div>
       </div>
@@ -116,6 +121,66 @@ var firebaseConfig = {
     var auth = firebase.auth();
     var db = firebase.firestore();
     var currentAdmin = null;
+
+    // Supabase CV service configuration. Replace only the publishable key placeholder.
+    var CV_FUNCTION_URL = "https://bdwxycxgpkxjxlupumyb.supabase.co/functions/v1/member-cv-manager";
+    var SUPABASE_PUBLISHABLE_KEY = "sb_publishable_ATutIxSZ5EHusI01zhX6lQ_KCLLjeD2";
+
+    async function callCVAdmin(action, extra) {
+      if (!currentAdmin) throw new Error("Admin হিসেবে লগইন করুন।");
+      var token = await currentAdmin.getIdToken();
+      var response = await fetch(CV_FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "apikey": SUPABASE_PUBLISHABLE_KEY,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(Object.assign({ action: action }, extra || {}))
+      });
+      var result = await response.json().catch(function(){ return {}; });
+      if (!response.ok) throw new Error(result.error || "CV সার্ভিসে সমস্যা হয়েছে।");
+      return result;
+    }
+
+    async function loadMemberCVs() {
+      if (!currentAdmin) return;
+      var list = document.getElementById("member-cvs-list");
+      var status = document.getElementById("member-cvs-status");
+      list.replaceChildren(); status.textContent = "CV তালিকা লোড হচ্ছে...";
+      try {
+        var result = await callCVAdmin("admin-list");
+        if (!result.members || !result.members.length) { status.textContent = "এখনো কোনো সদস্য CV আপলোড করেননি।"; return; }
+        result.members.forEach(function(member) {
+          var card = document.createElement("div"); card.className = "member";
+          var title = document.createElement("strong"); title.textContent = member.name || "নাম পাওয়া যায়নি"; card.appendChild(title);
+          [
+            "ফোন: " + (member.phone || "তথ্য নেই"),
+            "ইমেইল: " + (member.email || "তথ্য নেই"),
+            "ফাইল: " + (member.fileName || "CV.pdf"),
+            "আপলোডের তারিখ: " + (member.uploadedAt ? new Date(member.uploadedAt).toLocaleString("bn-BD") : "তথ্য নেই")
+          ].forEach(function(value) { var line = document.createElement("p"); line.textContent = value; card.appendChild(line); });
+          var actions = document.createElement("div"); actions.className = "actions";
+          var download = document.createElement("button"); download.textContent = "CV ডাউনলোড";
+          download.addEventListener("click", async function() {
+            download.disabled = true;
+            try {
+              var file = await callCVAdmin("admin-download", { uid: member.uid });
+              if (!file.exists || !file.downloadUrl) throw new Error("CV পাওয়া যায়নি।");
+              window.open(file.downloadUrl, "_blank", "noopener");
+            } catch (error) { alert("CV ডাউনলোড করা যায়নি: " + error.message); }
+            finally { download.disabled = false; }
+          });
+          actions.appendChild(download); card.appendChild(actions); list.appendChild(card);
+        });
+        status.textContent = "মোট CV: " + result.members.length;
+      } catch (error) {
+        status.textContent = "CV তালিকা লোড করা যায়নি: " + error.message;
+        console.error("CV list error:", error);
+      }
+    }
+
+    document.getElementById("reload-member-cvs").addEventListener("click", loadMemberCVs);
 
     // Separate Firebase Authentication for creating new members
 var memberCreatorApp = firebase.apps.find(function(app) {
@@ -1093,6 +1158,7 @@ document.getElementById("new-member-form")
       }
     });
     if (viewId === "member-list-view") { loadMembers(); loadApplications(); }
+    if (viewId === "member-cvs-view") { loadMemberCVs(); }
   }
   navButtons.forEach(function(button) {
     button.addEventListener("click", function() {
