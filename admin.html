@@ -163,13 +163,27 @@ var firebaseConfig = {
           var actions = document.createElement("div"); actions.className = "actions";
           var download = document.createElement("button"); download.textContent = "CV ডাউনলোড";
           download.addEventListener("click", async function() {
+            // Open the tab immediately during the click to avoid popup blocking.
+            var downloadTab = window.open("about:blank", "_blank");
+            if (!downloadTab) {
+              alert("CV ডাউনলোডের জন্য এই ওয়েবসাইটের Pop-up অনুমতি দিন।");
+              return;
+            }
+
+            downloadTab.opener = null;
             download.disabled = true;
             try {
               var file = await callCVAdmin("admin-download", { uid: member.uid });
-              if (!file.exists || !file.downloadUrl) throw new Error("CV পাওয়া যায়নি।");
-              window.open(file.downloadUrl, "_blank", "noopener");
-            } catch (error) { alert("CV ডাউনলোড করা যায়নি: " + error.message); }
-            finally { download.disabled = false; }
+              if (!file.exists || !file.downloadUrl) {
+                throw new Error("CV পাওয়া যায়নি।");
+              }
+              downloadTab.location.href = file.downloadUrl;
+            } catch (error) {
+              downloadTab.close();
+              alert("CV ডাউনলোড করা যায়নি: " + error.message);
+            } finally {
+              download.disabled = false;
+            }
           });
           actions.appendChild(download); card.appendChild(actions); list.appendChild(card);
         });
