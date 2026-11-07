@@ -302,7 +302,14 @@ footer{background:light-dark(#12271e,#0d1712);color:#f4f7f4;padding:40px 0 22px}
             <div><label class="form-label" for="profile-email">ইমেইল</label><input class="form-input" id="profile-email" type="email" maxlength="254"></div>
             <div><label class="form-label" for="profile-phone">মোবাইল নম্বর</label><input class="form-input" id="profile-phone" maxlength="30"></div>
             <div><label class="form-label" for="profile-address">ঠিকানা / মেডিকেল কেস আইডি</label><input class="form-input" id="profile-address" maxlength="500"></div>
-            <div class="full"><label class="form-label" for="profile-photo">প্রোফাইল ছবির লিংক</label><input class="form-input" id="profile-photo" type="url" maxlength="2048"></div>
+            <div class="full">
+              <label class="form-label" for="member-photo-file">প্রোফাইল ছবি আপলোড করুন</label>
+              <input class="form-input" id="member-photo-file" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp">
+              <small style="display:block;color:var(--muted);margin-top:6px">JPG, PNG অথবা WebP ছবি; সর্বোচ্চ ৫ MB। নতুন ছবি আপলোড করলে আগের আপলোড করা ছবি প্রতিস্থাপিত হবে।</small>
+              <button class="btn btn-primary" id="member-photo-upload-button" type="button" style="margin-top:12px" onclick="uploadMemberPhoto()">ছবি আপলোড করুন</button>
+              <div id="member-photo-message" class="dashboard-message" role="status" aria-live="polite"></div>
+            </div>
+            <div class="full"><label class="form-label" for="profile-photo">প্রোফাইল ছবির লিংক (ঐচ্ছিক)</label><input class="form-input" id="profile-photo" type="url" maxlength="2048"></div>
           </div>
           <button class="btn btn-primary" type="button" style="margin-top:18px" onclick="saveMemberProfile()">তথ্য সংরক্ষণ করুন</button>
           <div id="profile-message" class="dashboard-message" role="status"></div>
@@ -371,6 +378,71 @@ async function callCVFunction(action, options) {
   var result = await response.json().catch(function(){ return {}; });
   if (!response.ok) throw new Error(result.error || 'CV সার্ভিসে সমস্যা হয়েছে।');
   return result;
+}
+
+async function loadMyPhoto(fallbackUrl) {
+  var photo = document.getElementById('dashboard-member-photo');
+  if (!photo || !firebase.auth().currentUser) return;
+  try {
+    var result = await callCVFunction('my-photo', {
+      method: 'POST',
+      body: JSON.stringify({ action: 'my-photo' })
+    });
+    if (result.exists && result.photoUrl) {
+      photo.onerror = function(){ photo.hidden = true; };
+      photo.src = result.photoUrl;
+      photo.hidden = false;
+      return;
+    }
+  } catch (error) {
+    console.warn('Uploaded profile photo could not be loaded:', error);
+  }
+  if (fallbackUrl) {
+    photo.onerror = function(){ photo.hidden = true; };
+    photo.src = fallbackUrl;
+    photo.hidden = false;
+  } else {
+    photo.removeAttribute('src');
+    photo.hidden = true;
+  }
+}
+
+async function uploadMemberPhoto() {
+  var input = document.getElementById('member-photo-file');
+  var button = document.getElementById('member-photo-upload-button');
+  var message = document.getElementById('member-photo-message');
+  var file = input.files && input.files[0];
+  if (!firebase.auth().currentUser) { message.textContent = 'প্রথমে সদস্য হিসেবে লগইন করুন।'; return; }
+  if (!file) { message.textContent = 'প্রথমে একটি ছবি নির্বাচন করুন।'; return; }
+  var allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!allowedTypes.includes(file.type)) {
+    message.textContent = 'শুধুমাত্র JPG, PNG অথবা WebP ছবি গ্রহণযোগ্য।'; return;
+  }
+  if (file.size <= 0 || file.size > 5 * 1024 * 1024) {
+    message.textContent = 'ছবির সাইজ ৫ MB-এর বেশি হতে পারবে না।'; return;
+  }
+  button.disabled = true;
+  message.textContent = 'প্রোফাইল ছবি আপলোড হচ্ছে...';
+  try {
+    var form = new FormData();
+    form.append('action', 'photo-upload');
+    form.append('file', file, file.name);
+    var result = await callCVFunction('', { method: 'POST', body: form });
+    if (result.photoUrl) {
+      var photo = document.getElementById('dashboard-member-photo');
+      photo.onerror = function(){ photo.hidden = true; };
+      photo.src = result.photoUrl;
+      photo.hidden = false;
+    } else {
+      await loadMyPhoto(document.getElementById('profile-photo').value.trim());
+    }
+    input.value = '';
+    message.textContent = 'আপনার প্রোফাইল ছবি সফলভাবে আপলোড হয়েছে।';
+  } catch (error) {
+    message.textContent = 'ছবি আপলোড করা যায়নি: ' + error.message;
+  } finally {
+    button.disabled = false;
+  }
 }
 
 async function loadMyCV() {
@@ -505,11 +577,7 @@ function loadMemberProfile(user,fromLogin){
     document.getElementById('dashboard-member-name').textContent=data.name||'সদস্য';
     document.getElementById('dashboard-summary-name').textContent=data.name||'নাম দেওয়া হয়নি';
     document.getElementById('dashboard-summary-email').textContent=data.email||user.email||'';
-    var photo=document.getElementById('dashboard-member-photo');
-    if(data.photoURL){
-      photo.src=data.photoURL;photo.hidden=false;
-      photo.onerror=function(){photo.hidden=true;};
-    }else{photo.removeAttribute('src');photo.hidden=true;}
+    loadMyPhoto(data.photoURL||'');
     showMemberDashboard();
     loadMyCV();
     if(message)message.textContent='আপনার সদস্য-তথ্য লোড হয়েছে।';
@@ -650,8 +718,7 @@ function saveMemberProfile(){
     document.getElementById('dashboard-member-name').textContent=data.name;
     document.getElementById('dashboard-summary-name').textContent=data.name;
     document.getElementById('dashboard-summary-email').textContent=data.email;
-    var photo=document.getElementById('dashboard-member-photo');
-    if(data.photoURL){photo.src=data.photoURL;photo.hidden=false;}else{photo.removeAttribute('src');photo.hidden=true;}
+    loadMyPhoto(data.photoURL||'');
     message.textContent='আপনার সদস্য-তথ্য সংরক্ষণ হয়েছে।';
   }).catch(function(error){
     console.error('Profile save error:',error);
