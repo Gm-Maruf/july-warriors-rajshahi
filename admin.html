@@ -42,7 +42,21 @@
     body>footer{color:#6b83a3;font-weight:600}
     @media(max-width:850px){.layout{grid-template-columns:1fr}.sidebar{position:relative;height:auto;padding:12px;display:flex;gap:6px;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.side-caption{display:none}.nav-group{margin:0;flex:0 0 auto}.nav-link{white-space:nowrap}.subnav{padding:2px 0;display:flex;gap:3px}.sub-link{white-space:nowrap}.main-area{padding:18px}.topbar{padding:0 16px}.welcome{padding:18px}}
     @media(max-width:560px){.brand h1{font-size:15px}.topbar{height:auto;min-height:68px}.top-actions a{display:none}.main-area{padding:13px}.panel{padding:16px}.form-grid{grid-template-columns:1fr}.form-grid .full{grid-column:auto}.welcome{align-items:flex-start;flex-direction:column}.welcome h2{font-size:18px}}
-  </style>
+  
+    /* Admin member profile photos */
+.member-profile-photo {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #dbeafe;
+  background: #f1f5f9;
+  display: block;
+  margin-bottom: 12px;
+}
+    
+    
+    </style>
 
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
@@ -274,62 +288,130 @@ var memberCreatorAuth = memberCreatorApp.auth();
       auth.signOut();
     });
 
-    async function loadMembers() {
-      if (!currentAdmin) return;
+    
+async function loadMembers() {
+  if (!currentAdmin) return;
 
-      var list = document.getElementById("members-list");
-      var status = document.getElementById("members-status");
-      list.replaceChildren();
-      status.textContent = "সদস্যদের তথ্য লোড হচ্ছে...";
+  var list = document.getElementById("members-list");
+  var status = document.getElementById("members-status");
 
-      try {
-        var snapshot = await db.collection("members").get();
+  list.replaceChildren();
+  status.textContent = "সদস্যদের তথ্য লোড হচ্ছে...";
 
-        snapshot.forEach(function(doc) {
-          var data = doc.data();
-          var card = document.createElement("div");
-          card.className = "member";
+  try {
+    // Load member records from Firestore
+    var snapshot = await db.collection("members").get();
 
-          var title = document.createElement("strong");
-          title.textContent = data.name || "নাম দেওয়া হয়নি";
-          card.appendChild(title);
+    // Load private profile photo URLs through admin-only Edge Function
+    var photoMap = {};
 
-          ["email", "phone", "address", "role"].forEach(function(field) {
-            var line = document.createElement("p");
-            line.textContent = field + ": " + (data[field] || "তথ্য নেই");
-            card.appendChild(line);
-          });
+    try {
+      var photoResult = await callCVAdmin("admin-list-photos");
 
-          var actions = document.createElement("div");
-          actions.className = "actions";
+      if (photoResult.photos && Array.isArray(photoResult.photos)) {
+        photoResult.photos.forEach(function(photo) {
+          photoMap[photo.uid] = photo;
+        });
+      }
+    } catch (photoError) {
+      console.error("Member profile photos could not be loaded:", photoError);
+    }
 
-          var edit = document.createElement("button");
-          edit.textContent = "তথ্য সম্পাদনা";
-          edit.addEventListener("click", function() {
-            editMember(doc.id, data);
-          });
-          actions.appendChild(edit);
+    if (snapshot.empty) {
+      status.textContent = "এখনো কোনো সদস্য রেকর্ড নেই।";
+      return;
+    }
 
-          if (doc.id !== currentAdmin.uid) {
-            var remove = document.createElement("button");
-            remove.textContent = "সদস্য রেকর্ড মুছুন";
-            remove.className = "danger";
-            remove.addEventListener("click", function() {
-              deleteMember(doc.id, data.name || doc.id);
-            });
-            actions.appendChild(remove);
-          }
+    snapshot.forEach(function(doc) {
+      var data = doc.data();
 
-          card.appendChild(actions);
-          list.appendChild(card);
+      var card = document.createElement("div");
+      card.className = "member";
+
+      // Profile photo
+      var photo = photoMap[doc.id];
+
+      var photoElement = document.createElement("img");
+      photoElement.className = "member-profile-photo";
+      photoElement.alt = "সদস্যের Profile Photo";
+
+      if (photo && photo.photoUrl) {
+        photoElement.src = photo.photoUrl;
+
+        photoElement.onerror = function() {
+          photoElement.style.display = "none";
+        };
+      } else {
+        photoElement.style.display = "none";
+      }
+
+      card.appendChild(photoElement);
+
+      // Member name
+      var title = document.createElement("strong");
+      title.textContent = data.name || "নাম দেওয়া হয়নি";
+      card.appendChild(title);
+
+      // Member information
+      ["email", "phone", "address", "role"].forEach(function(field) {
+        var line = document.createElement("p");
+        line.textContent = field + ": " + (data[field] || "তথ্য নেই");
+        card.appendChild(line);
+      });
+
+      // Photo upload information
+      if (photo) {
+        var photoInfo = document.createElement("p");
+        photoInfo.textContent =
+          "Profile Photo: আপলোড করা আছে" +
+          (photo.uploadedAt
+            ? " | " + new Date(photo.uploadedAt).toLocaleString("bn-BD")
+            : "");
+
+        card.appendChild(photoInfo);
+      } else {
+        var noPhoto = document.createElement("p");
+        noPhoto.textContent = "Profile Photo: আপলোড করা হয়নি";
+        card.appendChild(noPhoto);
+      }
+
+      // Existing member actions
+      var actions = document.createElement("div");
+      actions.className = "actions";
+
+      var edit = document.createElement("button");
+      edit.textContent = "তথ্য সম্পাদনা";
+
+      edit.addEventListener("click", function() {
+        editMember(doc.id, data);
+      });
+
+      actions.appendChild(edit);
+
+      if (doc.id !== currentAdmin.uid) {
+        var remove = document.createElement("button");
+        remove.textContent = "সদস্য রেকর্ড মুছুন";
+        remove.className = "danger";
+
+        remove.addEventListener("click", function() {
+          deleteMember(doc.id, data.name || doc.id);
         });
 
-        status.textContent = "মোট সদস্য রেকর্ড: " + snapshot.size;
-      } catch (error) {
-        status.textContent = "সদস্য তালিকা লোড করা যায়নি।";
-        console.error(error);
+        actions.appendChild(remove);
       }
-    }
+
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+
+    status.textContent = "মোট সদস্য রেকর্ড: " + snapshot.size;
+
+  } catch (error) {
+    status.textContent = "সদস্য তালিকা লোড করা যায়নি: " + error.message;
+    console.error(error);
+  }
+}
+
 
     async function editMember(uid, data) {
       if (!currentAdmin) return;
